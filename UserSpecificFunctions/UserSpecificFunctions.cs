@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Data;
+using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
@@ -25,6 +26,7 @@ namespace UserSpecificFunctions
         public override Version Version { get { return new Version(1, 0, 0, 0); } }
 
         private static string Specifier;
+        private static string SilentSpecifier;
 
         private IDbConnection db;
 
@@ -64,10 +66,16 @@ namespace UserSpecificFunctions
         private void OnInitialize(EventArgs args)
         {
             Specifier = TShock.Config.CommandSpecifier;
+            SilentSpecifier = TShock.Config.CommandSilentSpecifier;
             InitDB();
             LoadConfig();
             LoadDatabase();
+
+            Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
+
+            Commands.ChatCommands.Add(new Command(Help, "help") { HelpText = "Lists commands or gives help on them." });
             Commands.ChatCommands.Add(new Command(UserCommand, "us"));
+            Commands.ChatCommands.Add(new Command("us.permission", USPermission, "permission"));
         }
 
         private void OnChat(ServerChatEventArgs args)
@@ -77,7 +85,7 @@ namespace UserSpecificFunctions
 
             TSPlayer tsplr = TShock.Players[args.Who];
 
-            if (!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier)
+            if (!args.Text.StartsWith(Specifier) && !args.Text.StartsWith(SilentSpecifier)
                 && !tsplr.mute && tsplr.IsLoggedIn && players.ContainsKey(tsplr.User.ID))
             {
                 string prefix = players[tsplr.User.ID].Prefix == null ? tsplr.Group.Prefix : players[tsplr.User.ID].Prefix;
@@ -89,6 +97,26 @@ namespace UserSpecificFunctions
 
                 args.Handled = true;
             }
+            else if (args.Text.StartsWith(Specifier) || args.Text.StartsWith(SilentSpecifier) 
+                && !string.IsNullOrWhiteSpace(args.Text.Substring(1)))
+            {
+                try
+                {
+                    if (tsplr.User != null && players.ContainsKey(tsplr.User.ID))
+                    {
+                        args.Handled = ExecuteComamnd(tsplr, args.Text);
+                    }
+                    else
+                    {
+                        args.Handled = Commands.HandleCommand(tsplr, args.Text);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TShock.Log.ConsoleError("An exception occured executing a command.");
+                    TShock.Log.Error(ex.ToString());
+                }
+            }
         }
 
         private void OnReload(ReloadEventArgs args)
@@ -99,6 +127,68 @@ namespace UserSpecificFunctions
         #endregion
 
         #region Commands
+        private void Help(CommandArgs args)
+        {
+            if (args.Parameters.Count > 1)
+            {
+                args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}help <command/page>", TShock.Config.CommandSpecifier);
+                return;
+            }
+
+            int pageNumber;
+            if (args.Parameters.Count == 0 || int.TryParse(args.Parameters[0], out pageNumber))
+            {
+                if (!PaginationTools.TryParsePageNumber(args.Parameters, 0, args.Player, out pageNumber))
+                {
+                    return;
+                }
+
+                IEnumerable<string> cmdNames = from cmd in Commands.ChatCommands
+                                               where cmd.CanRun(args.Player)
+                                               || (args.Player.User != null && players.ContainsKey(args.Player.User.ID) && players[args.Player.User.ID].Permissions.Contains(cmd.Permissions[0])) && (cmd.Name != "auth" || TShock.AuthToken != 0)
+                                               orderby cmd.Name
+                                               select TShock.Config.CommandSpecifier + cmd.Name;
+
+                PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cmdNames),
+                    new PaginationTools.Settings
+                    {
+                        HeaderFormat = "Commands ({0}/{1}):",
+                        FooterFormat = "Type {0}help {{0}} for more.".SFormat(TShock.Config.CommandSpecifier)
+                    });
+            }
+            else
+            {
+                string commandName = args.Parameters[0].ToLower();
+                if (commandName.StartsWith(TShock.Config.CommandSpecifier))
+                {
+                    commandName = commandName.Substring(1);
+                }
+
+                Command command = Commands.ChatCommands.Find(c => c.Names.Contains(commandName));
+                if (command == null)
+                {
+                    args.Player.SendErrorMessage("Invalid command.");
+                    return;
+                }
+                if (!command.CanRun(args.Player) && !CheckPerm(args.Player.User.ID, command.Permissions[0]))
+                {
+                    args.Player.SendErrorMessage("You do not have access to this command.");
+                    return;
+                }
+
+                args.Player.SendSuccessMessage("{0}{1} help: ", TShock.Config.CommandSpecifier, command.Name);
+                if (command.HelpDesc == null)
+                {
+                    args.Player.SendInfoMessage(command.HelpText);
+                    return;
+                }
+                foreach (string line in command.HelpDesc)
+                {
+                    args.Player.SendInfoMessage(line);
+                }
+            }
+        }
+
         private void UserCommand(CommandArgs args)
         {
             if (args.Parameters.Count < 1)
@@ -488,6 +578,130 @@ namespace UserSpecificFunctions
                     return;
             }
         }
+
+        private void USPermission(CommandArgs args)
+        {
+            if (args.Parameters.Count < 1)
+            {
+                args.Player.SendErrorMessage("Invalid syntax:");
+                args.Player.SendErrorMessage("{0}permission add <player name> <permission>", Specifier);
+                args.Player.SendErrorMessage("{0}permission delete <player name> <permission>", Specifier);
+                return;
+            }
+
+            switch (args.Parameters[0].ToLower())
+            {
+                case "add":
+                    {
+                        if (args.Parameters.Count != 3)
+                        {
+                            args.Player.SendErrorMessage("Invalid syntax: {0}permission add <player name> <permission>", Specifier);
+                            return;
+                        }
+
+                        List<User> users = TShock.Users.GetUsersByName(args.Parameters[1]);
+                        string permission = string.Join(" ", args.Parameters[2]);
+
+                        if (users.Count == 0)
+                        {
+                            args.Player.SendErrorMessage("Invalid user.");
+                            return;
+                        }
+                        else if (users.Count > 1)
+                        {
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(x => x.Name));
+                            return;
+                        }
+                        else if (CheckPerm(users[0].ID, permission))
+                        {
+                            args.Player.SendInfoMessage("This user already has this permission.");
+                            return;
+                        }
+                        else
+                        {
+                            ModifyPermissions(users[0].ID, permission);
+                            args.Player.SendSuccessMessage("Modified {0} permissions successfully.", users[0].Name.Suffix());
+                        }
+                    }
+                    return;
+                case "del":
+                case "rem":
+                case "delete":
+                case "remove":
+                    {
+                        if (args.Parameters.Count != 3)
+                        {
+                            args.Player.SendErrorMessage("Invalid syntax: {0}permission delete <player name> <permission>", Specifier);
+                            return;
+                        }
+
+                        List<User> users = TShock.Users.GetUsersByName(args.Parameters[1]);
+                        string permission = string.Join(" ", args.Parameters[2]);
+
+                        if (users.Count == 0)
+                        {
+                            args.Player.SendErrorMessage("Invalid user.");
+                            return;
+                        }
+                        else if (users.Count > 1)
+                        {
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(x => x.Name));
+                            return;
+                        }
+                        else if (!CheckPerm(users[0].ID, permission))
+                        {
+                            args.Player.SendInfoMessage("This user does not have this permission.");
+                            return;
+                        }
+                        else
+                        {
+                            ModifyPermissions(users[0].ID, permission, true);
+                            args.Player.SendSuccessMessage("Modified {0} permissions successfully.", users[0].Name.Suffix());
+                        }
+                    }
+                    return;
+                case "list":
+                    {
+                        if (args.Parameters.Count < 2 || args.Parameters.Count > 3)
+                        {
+                            args.Player.SendErrorMessage("Invalid syntax: {0}permission list <player name> [page]", Specifier);
+                            return;
+                        }
+
+                        List<User> users = TShock.Users.GetUsersByName(args.Parameters[1]);
+                        if (users.Count == 0)
+                        {
+                            args.Player.SendErrorMessage("Invalid user.");
+                            return;
+                        }
+                        else if (users.Count > 1)
+                        {
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(x => x.Name));
+                            return;
+                        }
+                        else if (!players.ContainsKey(users[0].ID))
+                        {
+                            args.Player.SendErrorMessage("This user doesn't have any permissions to list.");
+                            return;
+                        }
+                        else
+                        {
+                            int pageNum;
+                            if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out pageNum))
+                                return;
+
+                            PaginationTools.SendPage(args.Player, pageNum, PaginationTools.BuildLinesFromTerms(ListCommands(users[0].ID)),
+                                new PaginationTools.Settings
+                                {
+                                    HeaderFormat = "{0}{1} permissions:".SFormat(users[0].Name, users[0].Name.Suffix()),
+                                    FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, users[0].Name),
+                                    NothingToDisplayString = "This user has no specific permissions to display."
+                                });
+                        }
+                    }
+                    return;
+            }
+        }
         #endregion
 
         #region Database Methods
@@ -522,7 +736,8 @@ namespace UserSpecificFunctions
                 new SqlColumn("UserID", MySqlDbType.Int32),
                 new SqlColumn("Prefix", MySqlDbType.Text),
                 new SqlColumn("Suffix", MySqlDbType.Text),
-                new SqlColumn("Color", MySqlDbType.Text)));
+                new SqlColumn("Color", MySqlDbType.Text),
+                new SqlColumn("Permissions", MySqlDbType.Text)));
         }
 
         private void LoadDatabase()
@@ -537,8 +752,16 @@ namespace UserSpecificFunctions
                     string Prefix = reader.Get<string>("Prefix");
                     string Suffix = reader.Get<string>("Suffix");
                     string Color = reader.Get<string>("Color");
+                    string[] perms = reader.Get<string>("Permissions").Split(',');
 
-                    players.Add(UserID, new USPlayer(UserID, Prefix, Suffix, Color));
+                    List<string> Permissions = new List<string>();
+                    foreach (string perm in perms)
+                    {
+                        if (perm != null)
+                            Permissions.Add(perm);
+                    }
+
+                    players.Add(UserID, new USPlayer(UserID, Prefix, Suffix, Color, Permissions));
                 }
             }
         }
@@ -547,8 +770,8 @@ namespace UserSpecificFunctions
         {
             if (!players.ContainsKey(userid))
             {
-                players.Add(userid, new USPlayer(userid, prefix, null, "000,000,000"));
-                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color) VALUES (@0, @1, @2, @3);", userid.ToString(), prefix, null, "000,000,000");
+                players.Add(userid, new USPlayer(userid, prefix, null, "000,000,000", new List<string>()));
+                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), prefix, null, "000,000,000", null);
             }
             else
             {
@@ -561,8 +784,8 @@ namespace UserSpecificFunctions
         {
             if (!players.ContainsKey(userid))
             {
-                players.Add(userid, new USPlayer(userid, null, suffix, "000,000,000"));
-                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color) VALUES (@0, @1, @2, @3);", userid.ToString(), null, suffix, "000,000,000");
+                players.Add(userid, new USPlayer(userid, null, suffix, "000,000,000", new List<string>()));
+                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, suffix, "000,000,000", null);
             }
             else
             {
@@ -575,8 +798,8 @@ namespace UserSpecificFunctions
         {
             if (!players.ContainsKey(userid))
             {
-                players.Add(userid, new USPlayer(userid, null, null, color));
-                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color) VALUES (@0, @1, @2, @3);", userid.ToString(), null, null, color);
+                players.Add(userid, new USPlayer(userid, null, null, color, new List<string>()));
+                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, null, color, null);
             }
             else
             {
@@ -585,12 +808,35 @@ namespace UserSpecificFunctions
             }
         }
 
+        private void ModifyPermissions(int userid, string permission, bool remove = false)
+        {
+            if (!remove)
+            {
+                if (!players.ContainsKey(userid))
+                {
+                    players.Add(userid, new USPlayer(userid, null, null, "000,000,000", new List<string> { permission }));
+                    db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, null, "000,000,000", permission);
+                }
+                else
+                {
+                    players[userid].AddPermission(permission);
+                    string perms = string.Join(",", players[userid].Permissions.ToArray());
+                    db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", perms, userid.ToString());
+                }
+            }
+            else
+            {
+                players[userid].RemovePermission(permission);
+                string perms = string.Join(",", players[userid].Permissions.ToArray());
+                db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", perms, userid.ToString());
+            }
+        }
+
         private void ResetPlayerData(int userid)
         {
-            players[userid].Prefix = null;
-            players[userid].Suffix = null;
-            players[userid].Color = "000,000,000";
-            db.Query("UPDATE UserSpecificFunctions SET Prefix=null, Suffix=null, Color=@0 WHERE UserID=@1;", "000,000,000", userid.ToString());
+            SetPrefix(userid);
+            SetSuffix(userid);
+            SetColor(userid);
         }
 
         private void DeleteUser(int userid)
@@ -611,10 +857,110 @@ namespace UserSpecificFunctions
         }
         #endregion
 
+        #region Command
+        private bool RunCommand(Command command, string msg, TSPlayer tsPlayer, List<string> args)
+        {
+            try
+            {
+                CommandDelegate commandD = command.CommandDelegate;
+                commandD(new CommandArgs(msg, tsPlayer, args));
+            }
+            catch (Exception ex)
+            {
+                tsPlayer.SendErrorMessage("Command failed, check logs for more details.");
+                TShock.Log.Error(ex.ToString());
+            }
+
+            return true;
+        }
+
+        private bool ExecuteComamnd(TSPlayer player, string text)
+        {
+            string cmdText = text.Remove(0, 1);
+            string cmdPrefix = text[0].ToString();
+            bool silent = false;
+
+            if (cmdPrefix == TShock.Config.CommandSilentSpecifier)
+                silent = true;
+
+            var args = GetParseParametersMethod(new object[] { cmdText });
+            if (args.Count < 1)
+                return false;
+
+            string cmdName = args[0].ToLower();
+            args.RemoveAt(0);
+
+            IEnumerable<Command> cmds = Commands.ChatCommands.FindAll(c => c.HasAlias(cmdName));
+
+            if (cmds.Count() == 0)
+            {
+                if (player.AwaitingResponse.ContainsKey(cmdName))
+                {
+                    Action<CommandArgs> call = player.AwaitingResponse[cmdName];
+                    player.AwaitingResponse.Remove(cmdName);
+                    call(new CommandArgs(cmdText, player, args));
+                    return true;
+                }
+                player.SendErrorMessage("Invalid command entered. Type {0}help for a list of valid commands.", TShock.Config.CommandSpecifier);
+                return true;
+            }
+            foreach (Command command in cmds)
+            {
+                if (!command.AllowServer && !player.RealPlayer)
+                {
+                    player.SendErrorMessage("You must use this command in-game.");
+                }
+                else if (!command.CanRun(player) && !CheckPerm(player.User.ID, command.Permissions[0]))
+                {
+                    TShock.Utils.SendLogs(string.Format("{0} tried to execute {1}{2}.", player.Name, Specifier, cmdText), Color.PaleVioletRed, player);
+                    player.SendErrorMessage("You do not have access to this command.");
+                }
+                else
+                {
+                    if (command.DoLog)
+                        TShock.Utils.SendLogs(string.Format("{0} executed: {1}{2}.", player.Name, silent ? SilentSpecifier : Specifier, cmdText), Color.PaleVioletRed, player);
+                    RunCommand(command, cmdText, player, args);
+                }
+            }
+
+            return true;
+        }
+
+        private List<string> GetParseParametersMethod(params object[] args)
+        {
+            MethodInfo methodInfo = typeof(Commands).GetMethod("ParseParameters", BindingFlags.NonPublic | BindingFlags.Static);
+            return (List<string>)methodInfo.Invoke(null, args);
+        }
+
+        private bool CheckPerm(int userid, string permission)
+        {
+            if (TShock.Users.GetUserByID(userid) != null && players.ContainsKey(userid))
+            {
+                return players[userid].HasPermission(permission);
+            }
+
+            return false;
+        }
+        #endregion
+
         #region LoadConfig
         private void LoadConfig()
         {
             (config = config.Read(configPath)).Write(configPath);
+        }
+        #endregion
+
+        #region Miscellaneous
+        private List<string> ListCommands(int userid)
+        {
+            List<string> permissions = new List<string>();
+            foreach (string permission in players[userid].Permissions)
+            {
+                Command command = Commands.ChatCommands.Find(c => c.Permissions.Contains(permission));
+                permissions.Add(permission + " ({0}{1})".SFormat(command == null ? "" : Specifier, command == null ? "Not a command." : command.Name));
+            }
+
+            return permissions;
         }
         #endregion
     }

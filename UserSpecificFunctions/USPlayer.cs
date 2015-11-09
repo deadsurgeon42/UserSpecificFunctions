@@ -14,6 +14,7 @@ namespace UserSpecificFunctions
         public byte R { get; private set; }
         public byte G { get; private set; }
         public byte B { get; private set; }
+        public List<string> Permissions { get; set; }
 
         public string Color
         {
@@ -46,14 +47,31 @@ namespace UserSpecificFunctions
             R = 0;
             G = 0;
             B = 0;
+            Permissions = new List<string>();
         }
 
-        public USPlayer(int UserID, string Prefix, string Suffix, string Color)
+        public USPlayer(int UserID, string Prefix, string Suffix, string Color, List<string> Permissions)
         {
             this.UserID = UserID;
             this.Prefix = Prefix;
             this.Suffix = Suffix;
             this.Color = Color;
+            this.Permissions = Permissions;
+        }
+
+        public void AddPermission(string permission)
+        {
+            this.Permissions.Add(permission);
+        }
+
+        public void RemovePermission(string permission)
+        {
+            this.Permissions.Remove(permission);
+        }
+
+        public bool HasPermission(string permission)
+        {
+            return this.Permissions.Contains(permission);
         }
     }
 }
