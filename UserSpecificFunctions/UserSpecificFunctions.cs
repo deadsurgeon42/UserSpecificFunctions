@@ -46,6 +46,8 @@ namespace UserSpecificFunctions
             ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             ServerApi.Hooks.ServerChat.Register(this, OnChat);
 
+            PlayerHooks.PlayerCommand += OnCommand;
+
             GeneralHooks.ReloadEvent += OnReload;
         }
 
@@ -55,6 +57,8 @@ namespace UserSpecificFunctions
             {
                 ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
                 ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
+
+                PlayerHooks.PlayerCommand += OnCommand;
 
                 GeneralHooks.ReloadEvent -= OnReload;
             }
@@ -119,6 +123,45 @@ namespace UserSpecificFunctions
             }
         }
 
+        private void OnCommand(PlayerCommandEventArgs args)
+        {
+            if (args.Handled || args.Player == null)
+                return;
+
+            if (args.CommandName == "kick")
+            {
+                if (args.Parameters.Count == 1)
+                {
+                    List<TSPlayer> players = TShock.Utils.FindPlayer(args.Parameters[0]);
+                    if (players.Count == 1)
+                    {
+                        var player = players[0];
+                        if (args.Player.RealPlayer && player.Group.HasPermission(Permissions.immunetokick) || CheckPerm(player.User.ID, Permissions.immunetokick))
+                        {
+                            args.Player.SendErrorMessage("You can't kick another admin!");
+                            args.Handled = true;
+                        }
+                    }
+                }
+            }
+            else if (args.CommandName == "mute")
+            {
+                if (args.Parameters.Count == 1)
+                {
+                    List<TSPlayer> players = TShock.Utils.FindPlayer(args.Parameters[0]);
+                    if (players.Count == 1)
+                    {
+                        var player = players[0];
+                        if (player.Group.HasPermission(Permissions.mute) || CheckPerm(player.User.ID, Permissions.mute))
+                        {
+                            args.Player.SendErrorMessage("You cannot mute this player.");
+                            args.Handled = true;
+                        }
+                    }
+                }
+            }
+        }
+
         private void OnReload(ReloadEventArgs args)
         {
             LoadConfig();
@@ -131,7 +174,7 @@ namespace UserSpecificFunctions
         {
             if (args.Parameters.Count > 1)
             {
-                args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}help <command/page>", TShock.Config.CommandSpecifier);
+                args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}help <command/page>", Specifier);
                 return;
             }
 
@@ -145,21 +188,21 @@ namespace UserSpecificFunctions
 
                 IEnumerable<string> cmdNames = from cmd in Commands.ChatCommands
                                                where cmd.CanRun(args.Player)
-                                               || (args.Player.User != null && players.ContainsKey(args.Player.User.ID) && players[args.Player.User.ID].Permissions.Contains(cmd.Permissions[0])) && (cmd.Name != "auth" || TShock.AuthToken != 0)
+                                               || (CheckPerm(args.Player.User.ID, cmd.Permissions[0])) && (cmd.Name != "auth" || TShock.AuthToken != 0)
                                                orderby cmd.Name
-                                               select TShock.Config.CommandSpecifier + cmd.Name;
+                                               select Specifier + cmd.Name;
 
                 PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cmdNames),
                     new PaginationTools.Settings
                     {
                         HeaderFormat = "Commands ({0}/{1}):",
-                        FooterFormat = "Type {0}help {{0}} for more.".SFormat(TShock.Config.CommandSpecifier)
+                        FooterFormat = "Type {0}help {{0}} for more.".SFormat(Specifier)
                     });
             }
             else
             {
                 string commandName = args.Parameters[0].ToLower();
-                if (commandName.StartsWith(TShock.Config.CommandSpecifier))
+                if (commandName.StartsWith(Specifier))
                 {
                     commandName = commandName.Substring(1);
                 }
@@ -176,7 +219,7 @@ namespace UserSpecificFunctions
                     return;
                 }
 
-                args.Player.SendSuccessMessage("{0}{1} help: ", TShock.Config.CommandSpecifier, command.Name);
+                args.Player.SendSuccessMessage("{0}{1} help: ", Specifier, command.Name);
                 if (command.HelpDesc == null)
                 {
                     args.Player.SendInfoMessage(command.HelpText);
@@ -563,7 +606,7 @@ namespace UserSpecificFunctions
                             }
                             else
                             {
-                                args.Player.SendMessage("User: {0}".SFormat(TShock.Users.GetUserByID(users[0].ID).Name), Color.DodgerBlue);
+                                args.Player.SendMessage("User: {0}".SFormat(users[0].Name), Color.DodgerBlue);
                                 args.Player.SendMessage("Prefix: {0}".SFormat(string.IsNullOrWhiteSpace(players[users[0].ID].Prefix) ? "None" : players[users[0].ID].Prefix), Color.DodgerBlue);
                                 args.Player.SendMessage("Suffix: {0}".SFormat(string.IsNullOrWhiteSpace(players[users[0].ID].Suffix) ? "None" : players[users[0].ID].Suffix), Color.DodgerBlue);
                                 args.Player.SendMessage("Color: {0}".SFormat(players[users[0].ID].Color == "000,000,000" ? "None" : players[users[0].ID].Color), Color.DodgerBlue);
@@ -694,7 +737,7 @@ namespace UserSpecificFunctions
                                 new PaginationTools.Settings
                                 {
                                     HeaderFormat = "{0}{1} permissions:".SFormat(users[0].Name, users[0].Name.Suffix()),
-                                    FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, users[0].Name),
+                                    FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(Specifier, users[0].Name),
                                     NothingToDisplayString = "This user has no specific permissions to display."
                                 });
                         }
@@ -758,7 +801,9 @@ namespace UserSpecificFunctions
                     foreach (string perm in perms)
                     {
                         if (perm != null)
+                        {
                             Permissions.Add(perm);
+                        }
                     }
 
                     players.Add(UserID, new USPlayer(UserID, Prefix, Suffix, Color, Permissions));
@@ -770,8 +815,8 @@ namespace UserSpecificFunctions
         {
             if (!players.ContainsKey(userid))
             {
-                players.Add(userid, new USPlayer(userid, prefix, null, "000,000,000", new List<string>()));
-                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), prefix, null, "000,000,000", null);
+                players.Add(userid, new USPlayer(userid, prefix, null, "000,000,000", new List<string> { "" }));
+                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), prefix, null, "000,000,000", "");
             }
             else
             {
@@ -784,8 +829,8 @@ namespace UserSpecificFunctions
         {
             if (!players.ContainsKey(userid))
             {
-                players.Add(userid, new USPlayer(userid, null, suffix, "000,000,000", new List<string>()));
-                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, suffix, "000,000,000", null);
+                players.Add(userid, new USPlayer(userid, null, suffix, "000,000,000", new List<string> { "" }));
+                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, suffix, "000,000,000", "");
             }
             else
             {
@@ -798,8 +843,8 @@ namespace UserSpecificFunctions
         {
             if (!players.ContainsKey(userid))
             {
-                players.Add(userid, new USPlayer(userid, null, null, color, new List<string>()));
-                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, null, color, null);
+                players.Add(userid, new USPlayer(userid, null, null, color, new List<string> { "" }));
+                db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, null, color, "");
             }
             else
             {
@@ -892,6 +937,9 @@ namespace UserSpecificFunctions
 
             IEnumerable<Command> cmds = Commands.ChatCommands.FindAll(c => c.HasAlias(cmdName));
 
+            if (PlayerHooks.OnPlayerCommand(player, cmdName, cmdText, args, ref cmds, cmdPrefix))
+                return true;
+
             if (cmds.Count() == 0)
             {
                 if (player.AwaitingResponse.ContainsKey(cmdName))
@@ -901,7 +949,7 @@ namespace UserSpecificFunctions
                     call(new CommandArgs(cmdText, player, args));
                     return true;
                 }
-                player.SendErrorMessage("Invalid command entered. Type {0}help for a list of valid commands.", TShock.Config.CommandSpecifier);
+                player.SendErrorMessage("Invalid command entered. Type {0}help for a list of valid commands.", Specifier);
                 return true;
             }
             foreach (Command command in cmds)
