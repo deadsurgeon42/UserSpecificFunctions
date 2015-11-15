@@ -58,7 +58,7 @@ namespace UserSpecificFunctions
                 ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
                 ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
 
-                PlayerHooks.PlayerCommand += OnCommand;
+                PlayerHooks.PlayerCommand -= OnCommand;
 
                 GeneralHooks.ReloadEvent -= OnReload;
             }
