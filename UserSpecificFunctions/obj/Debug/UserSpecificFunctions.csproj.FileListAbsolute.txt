@@ -1,12 +1,7 @@
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\UserSpecificFunctions.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\UserSpecificFunctions.pdb
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\Mono.Data.Sqlite.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\MySql.Data.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\Newtonsoft.Json.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TerrariaServer.exe
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TShockAPI.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\BCrypt.Net.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.csprojResolveAssemblyReference.cache
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.dll
-C:\Users\sasa\Desktop\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.pdb
+c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\UserSpecificFunctions.dll
+c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\UserSpecificFunctions.pdb
+c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.csprojResolveAssemblyReference.cache
+c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.dll
+c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.pdb
+C:\Users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.dll
+C:\Users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\BCrypt.Net.dll

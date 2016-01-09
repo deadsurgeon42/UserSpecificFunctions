@@ -8,9 +8,22 @@ namespace UserSpecificFunctions.Extensions
 {
     public static class StringExtensions
     {
-        public static string Suffix(this string _string)
+        public static string Suffix(this string source)
         {
-            return _string + (_string.EndsWith("S") || _string.EndsWith("s") ? "'" : "'s");
+            return source + (source.EndsWith("s") ? "'" : "'s");
+        }
+
+        public static Color ToColor(this string source)
+        {
+            string[] color = source.Split(',');
+            byte r, g, b;
+
+            if (color.Length == 3 && byte.TryParse(color[0], out r) && byte.TryParse(color[1], out g) && byte.TryParse(color[2], out b))
+            {
+                return new Color(r, g, b);
+            }
+            else
+                throw new Exception("[USF] An error occured at 'ToColor'");
         }
     }
 }
