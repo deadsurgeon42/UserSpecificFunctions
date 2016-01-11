@@ -12,67 +12,67 @@ namespace UserSpecificFunctions
 {
     public static class USFCommands
     {
-        public static void Help(CommandArgs args)
-        {
-            if (args.Parameters.Count > 1)
-            {
-                args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}help <command/page>", TShock.Config.CommandSpecifier);
-                return;
-            }
+        //public static void Help(CommandArgs args)
+        //{
+        //    if (args.Parameters.Count > 1)
+        //    {
+        //        args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}help <command/page>", TShock.Config.CommandSpecifier);
+        //        return;
+        //    }
 
-            int pageNumber;
-            if (args.Parameters.Count == 0 || int.TryParse(args.Parameters[0], out pageNumber))
-            {
-                if (!PaginationTools.TryParsePageNumber(args.Parameters, 0, args.Player, out pageNumber))
-                {
-                    return;
-                }
+        //    int pageNumber;
+        //    if (args.Parameters.Count == 0 || int.TryParse(args.Parameters[0], out pageNumber))
+        //    {
+        //        if (!PaginationTools.TryParsePageNumber(args.Parameters, 0, args.Player, out pageNumber))
+        //        {
+        //            return;
+        //        }
 
-                IEnumerable<string> cmdNames = from cmd in Commands.ChatCommands
-                                               where cmd.CanRun(args.Player)
-                                               || (Utils.CheckPerm(args.Player.User.ID, cmd.Permissions[0])) && (cmd.Name != "auth" || TShock.AuthToken != 0)
-                                               orderby cmd.Name
-                                               select TShock.Config.CommandSpecifier + cmd.Name;
+        //        IEnumerable<string> cmdNames = from cmd in Commands.ChatCommands
+        //                                       where cmd.CanRun(args.Player)
+        //                                       || (Utils.CheckPerm(args.Player.User.ID, cmd.Permissions[0])) && (cmd.Name != "auth" || TShock.AuthToken != 0)
+        //                                       orderby cmd.Name
+        //                                       select TShock.Config.CommandSpecifier + cmd.Name;
 
-                PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cmdNames),
-                    new PaginationTools.Settings
-                    {
-                        HeaderFormat = "Commands ({0}/{1}):",
-                        FooterFormat = "Type {0}help {{0}} for more.".SFormat(TShock.Config.CommandSpecifier)
-                    });
-            }
-            else
-            {
-                string commandName = args.Parameters[0].ToLower();
-                if (commandName.StartsWith(TShock.Config.CommandSpecifier))
-                {
-                    commandName = commandName.Substring(1);
-                }
+        //        PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cmdNames),
+        //            new PaginationTools.Settings
+        //            {
+        //                HeaderFormat = "Commands ({0}/{1}):",
+        //                FooterFormat = "Type {0}help {{0}} for more.".SFormat(TShock.Config.CommandSpecifier)
+        //            });
+        //    }
+        //    else
+        //    {
+        //        string commandName = args.Parameters[0].ToLower();
+        //        if (commandName.StartsWith(TShock.Config.CommandSpecifier))
+        //        {
+        //            commandName = commandName.Substring(1);
+        //        }
 
-                Command command = Commands.ChatCommands.Find(c => c.Names.Contains(commandName));
-                if (command == null)
-                {
-                    args.Player.SendErrorMessage("Invalid command.");
-                    return;
-                }
-                if (!command.CanRun(args.Player) && !Utils.CheckPerm(args.Player.User.ID, command.Permissions[0]))
-                {
-                    args.Player.SendErrorMessage("You do not have access to this command.");
-                    return;
-                }
+        //        Command command = Commands.ChatCommands.Find(c => c.Names.Contains(commandName));
+        //        if (command == null)
+        //        {
+        //            args.Player.SendErrorMessage("Invalid command.");
+        //            return;
+        //        }
+        //        if (!command.CanRun(args.Player) && !Utils.CheckPerm(args.Player.User.ID, command.Permissions[0]))
+        //        {
+        //            args.Player.SendErrorMessage("You do not have access to this command.");
+        //            return;
+        //        }
 
-                args.Player.SendSuccessMessage("{0}{1} help: ", TShock.Config.CommandSpecifier, command.Name);
-                if (command.HelpDesc == null)
-                {
-                    args.Player.SendInfoMessage(command.HelpText);
-                    return;
-                }
-                foreach (string line in command.HelpDesc)
-                {
-                    args.Player.SendInfoMessage(line);
-                }
-            }
-        }
+        //        args.Player.SendSuccessMessage("{0}{1} help: ", TShock.Config.CommandSpecifier, command.Name);
+        //        if (command.HelpDesc == null)
+        //        {
+        //            args.Player.SendInfoMessage(command.HelpText);
+        //            return;
+        //        }
+        //        foreach (string line in command.HelpDesc)
+        //        {
+        //            args.Player.SendInfoMessage(line);
+        //        }
+        //    }
+        //}
 
         public static void USFMain(CommandArgs args)
         {
@@ -434,113 +434,113 @@ namespace UserSpecificFunctions
             }
         }
 
-        public static void USFPermission(CommandArgs args)
-        {
-            if (args.Parameters.Count < 1)
-            {
-                args.Player.SendErrorMessage("Invalid syntax:");
-                args.Player.SendErrorMessage("{0}permission add <player name> <permission>", TShock.Config.CommandSpecifier);
-                args.Player.SendErrorMessage("{0}permission delete <player name> <permission>", TShock.Config.CommandSpecifier);
-                return;
-            }
+        //public static void USFPermission(CommandArgs args)
+        //{
+        //    if (args.Parameters.Count < 1)
+        //    {
+        //        args.Player.SendErrorMessage("Invalid syntax:");
+        //        args.Player.SendErrorMessage("{0}permission add <player name> <permission>", TShock.Config.CommandSpecifier);
+        //        args.Player.SendErrorMessage("{0}permission delete <player name> <permission>", TShock.Config.CommandSpecifier);
+        //        return;
+        //    }
 
-            switch (args.Parameters[0].ToLower())
-            {
-                case "add":
-                    {
-                        if (args.Parameters.Count != 3)
-                        {
-                            args.Player.SendErrorMessage("Invalid syntax: {0}permission add <player name> <permission>", TShock.Config.CommandSpecifier);
-                            return;
-                        }
+        //    switch (args.Parameters[0].ToLower())
+        //    {
+        //        case "add":
+        //            {
+        //                if (args.Parameters.Count != 3)
+        //                {
+        //                    args.Player.SendErrorMessage("Invalid syntax: {0}permission add <player name> <permission>", TShock.Config.CommandSpecifier);
+        //                    return;
+        //                }
 
-                        string permission = string.Join(" ", args.Parameters[2]);
+        //                string permission = string.Join(" ", args.Parameters[2]);
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
-                        {
-                            args.Player.SendErrorMessage("Invalid user.");
-                            return;
-                        }
-                        else if (Utils.CheckPerm(user.ID, permission))
-                        {
-                            args.Player.SendInfoMessage("This user already has this permission.");
-                            return;
-                        }
-                        else
-                        {
-                            Database.ModifyPermissions(user.ID, permission);
-                            args.Player.SendSuccessMessage($"Modified {user.Name.Suffix()} permissions successfully.");
-                        }
-                    }
-                    return;
-                case "del":
-                case "rem":
-                case "delete":
-                case "remove":
-                    {
-                        if (args.Parameters.Count != 3)
-                        {
-                            args.Player.SendErrorMessage("Invalid syntax: {0}permission delete <player name> <permission>", TShock.Config.CommandSpecifier);
-                            return;
-                        }
+        //                User user = TShock.Users.GetUserByName(args.Parameters[1]);
+        //                if (user == null)
+        //                {
+        //                    args.Player.SendErrorMessage("Invalid user.");
+        //                    return;
+        //                }
+        //                else if (Utils.CheckPerm(user.ID, permission))
+        //                {
+        //                    args.Player.SendInfoMessage("This user already has this permission.");
+        //                    return;
+        //                }
+        //                else
+        //                {
+        //                    Database.ModifyPermissions(user.ID, permission);
+        //                    args.Player.SendSuccessMessage($"Modified {user.Name.Suffix()} permissions successfully.");
+        //                }
+        //            }
+        //            return;
+        //        case "del":
+        //        case "rem":
+        //        case "delete":
+        //        case "remove":
+        //            {
+        //                if (args.Parameters.Count != 3)
+        //                {
+        //                    args.Player.SendErrorMessage("Invalid syntax: {0}permission delete <player name> <permission>", TShock.Config.CommandSpecifier);
+        //                    return;
+        //                }
 
-                        string permission = string.Join(" ", args.Parameters[2]);
+        //                string permission = string.Join(" ", args.Parameters[2]);
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
-                        {
-                            args.Player.SendErrorMessage("Invalid user.");
-                            return;
-                        }
-                        else if (!Utils.CheckPerm(user.ID, permission))
-                        {
-                            args.Player.SendInfoMessage("This user does not have this permission.");
-                            return;
-                        }
-                        else
-                        {
-                            Database.ModifyPermissions(user.ID, permission, true);
-                            args.Player.SendSuccessMessage($"Modified {user.Name.Suffix()} permissions successfully.");
-                        }
-                    }
-                    return;
-                case "list":
-                    {
-                        if (args.Parameters.Count < 2 || args.Parameters.Count > 3)
-                        {
-                            args.Player.SendErrorMessage("Invalid syntax: {0}permission list <player name> [page]", TShock.Config.CommandSpecifier);
-                            return;
-                        }
+        //                User user = TShock.Users.GetUserByName(args.Parameters[1]);
+        //                if (user == null)
+        //                {
+        //                    args.Player.SendErrorMessage("Invalid user.");
+        //                    return;
+        //                }
+        //                else if (!Utils.CheckPerm(user.ID, permission))
+        //                {
+        //                    args.Player.SendInfoMessage("This user does not have this permission.");
+        //                    return;
+        //                }
+        //                else
+        //                {
+        //                    Database.ModifyPermissions(user.ID, permission, true);
+        //                    args.Player.SendSuccessMessage($"Modified {user.Name.Suffix()} permissions successfully.");
+        //                }
+        //            }
+        //            return;
+        //        case "list":
+        //            {
+        //                if (args.Parameters.Count < 2 || args.Parameters.Count > 3)
+        //                {
+        //                    args.Player.SendErrorMessage("Invalid syntax: {0}permission list <player name> [page]", TShock.Config.CommandSpecifier);
+        //                    return;
+        //                }
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
-                        {
-                            args.Player.SendErrorMessage("Invalid user.");
-                            return;
-                        }
-                        else if (!players.ContainsKey(user.ID))
-                        {
-                            args.Player.SendErrorMessage("This user doesn't have any permissions to list.");
-                            return;
-                        }
-                        else
-                        {
-                            int pageNum;
-                            if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out pageNum))
-                                return;
+        //                User user = TShock.Users.GetUserByName(args.Parameters[1]);
+        //                if (user == null)
+        //                {
+        //                    args.Player.SendErrorMessage("Invalid user.");
+        //                    return;
+        //                }
+        //                else if (!players.ContainsKey(user.ID))
+        //                {
+        //                    args.Player.SendErrorMessage("This user doesn't have any permissions to list.");
+        //                    return;
+        //                }
+        //                else
+        //                {
+        //                    int pageNum;
+        //                    if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out pageNum))
+        //                        return;
 
-                            PaginationTools.SendPage(args.Player, pageNum, PaginationTools.BuildLinesFromTerms(Utils.ListCommands(user.ID)),
-                                new PaginationTools.Settings
-                                {
-                                    HeaderFormat = $"{user.Name.Suffix()} permissions:",
-                                    FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, user.Name),
-                                    NothingToDisplayString = "This user has no specific permissions to display."
-                                });
-                        }
-                    }
-                    return;
-            }
-        }
+        //                    PaginationTools.SendPage(args.Player, pageNum, PaginationTools.BuildLinesFromTerms(Utils.ListCommands(user.ID)),
+        //                        new PaginationTools.Settings
+        //                        {
+        //                            HeaderFormat = $"{user.Name.Suffix()} permissions:",
+        //                            FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, user.Name),
+        //                            NothingToDisplayString = "This user has no specific permissions to display."
+        //                        });
+        //                }
+        //            }
+        //            return;
+        //    }
+        //}
     }
 }
