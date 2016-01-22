@@ -5,3 +5,5 @@ c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSp
 c:\users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.pdb
 C:\Users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.dll
 C:\Users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\BCrypt.Net.dll
+C:\Users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TerrariaServer.exe
+C:\Users\sasa\documents\visual studio 2015\Projects\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TShockAPI.dll

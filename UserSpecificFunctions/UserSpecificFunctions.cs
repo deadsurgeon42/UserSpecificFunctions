@@ -59,11 +59,11 @@ namespace UserSpecificFunctions
             Database.InitDB();
             Database.LoadDatabase();
 
-            //Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
+            Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
 
-            //Commands.ChatCommands.Add(new Command(USFCommands.Help, "help") { HelpText = "Lists commands or gives help on them." });
+            Commands.ChatCommands.Add(new Command(USFCommands.Help, "help") { HelpText = "Lists commands or gives help on them." });
             Commands.ChatCommands.Add(new Command(USFCommands.USFMain, "us"));
-            //Commands.ChatCommands.Add(new Command(Permissions.setPermissions, USFCommands.USFPermission, "permission"));
+            Commands.ChatCommands.Add(new Command(Permissions.setPermissions, USFCommands.USFPermission, "permission"));
         }
 
         private void OnChat(ServerChatEventArgs args)
@@ -86,26 +86,26 @@ namespace UserSpecificFunctions
                 args.Handled = true;
             }
 
-            //else if (args.Text.StartsWith(TShock.Config.CommandSpecifier) || args.Text.StartsWith(TShock.Config.CommandSilentSpecifier)
-            //    && !string.IsNullOrWhiteSpace(args.Text.Substring(1)))
-            //{
-            //    try
-            //    {
-            //        if (tsplr.User != null && players.ContainsKey(tsplr.User.ID))
-            //        {
-            //            args.Handled = Utils.ExecuteComamnd(tsplr, args.Text);
-            //        }
-            //        else
-            //        {
-            //            args.Handled = Commands.HandleCommand(tsplr, args.Text);
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        TShock.Log.ConsoleError("An exception occured executing a command.");
-            //        TShock.Log.Error(ex.ToString());
-            //    }
-            //}
+            else if (args.Text.StartsWith(TShock.Config.CommandSpecifier) || args.Text.StartsWith(TShock.Config.CommandSilentSpecifier)
+                && !string.IsNullOrWhiteSpace(args.Text.Substring(1)))
+            {
+                try
+                {
+                    if (tsplr.User != null && players.ContainsKey(tsplr.User.ID))
+                    {
+                        args.Handled = Utils.ExecuteComamnd(tsplr, args.Text);
+                    }
+                    else
+                    {
+                        args.Handled = Commands.HandleCommand(tsplr, args.Text);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TShock.Log.ConsoleError("An exception occured executing a command.");
+                    TShock.Log.Error(ex.ToString());
+                }
+            }
         }
 
         private void OnReload(ReloadEventArgs args)

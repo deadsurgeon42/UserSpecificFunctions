@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TShockAPI;
+using TShockAPI.DB;
 using TShockAPI.Hooks;
 using UserSpecificFunctions.Extensions;
 using static UserSpecificFunctions.UserSpecificFunctions;

@@ -121,29 +121,29 @@ namespace UserSpecificFunctions
             }
         }
 
-        //internal static void ModifyPermissions(int userid, string permission, bool remove = false)
-        //{
-        //    if (!remove)
-        //    {
-        //        if (!players.ContainsKey(userid))
-        //        {
-        //            players.Add(userid, new USFPlayer(userid, null, null, "000,000,000", new List<string> { permission }));
-        //            db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, null, "000,000,000", permission);
-        //        }
-        //        else
-        //        {
-        //            players[userid].AddPermission(permission);
-        //            string perms = string.Join(",", players[userid].Permissions.ToArray());
-        //            db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", perms, userid.ToString());
-        //        }
-        //    }
-        //    else
-        //    {
-        //        players[userid].RemovePermission(permission);
-        //        string perms = string.Join(",", players[userid].Permissions.ToArray());
-        //        db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", perms, userid.ToString());
-        //    }
-        //}
+        internal static void ModifyPermissions(int userid, string permission, bool remove = false)
+        {
+            if (!remove)
+            {
+                if (!players.ContainsKey(userid))
+                {
+                    players.Add(userid, new USFPlayer(userid, null, null, "000,000,000", new List<string> { permission }));
+                    db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", userid.ToString(), null, null, "000,000,000", permission);
+                }
+                else
+                {
+                    players[userid].AddPermission(permission);
+                    string perms = string.Join(",", players[userid].Permissions.ToArray());
+                    db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", perms, userid.ToString());
+                }
+            }
+            else
+            {
+                players[userid].RemovePermission(permission);
+                string perms = string.Join(",", players[userid].Permissions.ToArray());
+                db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", perms, userid.ToString());
+            }
+        }
 
         internal static void ResetPlayerData(int userid)
         {
