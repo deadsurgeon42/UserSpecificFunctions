@@ -371,6 +371,11 @@ namespace UserSpecificFunctions
                                 args.Player.SendErrorMessage("Invalid user.");
                                 return;
                             }
+                            else if (players.ContainsKey(user.ID))
+                            {
+                                args.Player.SendErrorMessage("This user has no custom data to reset.");
+                                return;
+                            }
                             else if (user.Name != args.Player.Name && !args.Player.Group.HasPermission(Permissions.setOther))
                             {
                                 args.Player.SendErrorMessage("You can't modify this player's data.");
