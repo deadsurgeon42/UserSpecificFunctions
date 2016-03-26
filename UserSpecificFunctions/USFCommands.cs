@@ -325,7 +325,7 @@ namespace UserSpecificFunctions
                                             }
                                             else if (!players.ContainsKey(users[0].ID) || players[users[0].ID].Prefix == null)
                                             {
-                                                args.Player.SendErrorMessage("This users[0] doesn't have a prefix to remove.");
+                                                args.Player.SendErrorMessage("This user doesn't have a prefix to remove.");
                                                 return;
                                             }
                                             else
@@ -344,7 +344,7 @@ namespace UserSpecificFunctions
                                             }
                                             else if (!players.ContainsKey(users[0].ID) || players[users[0].ID].Suffix == null)
                                             {
-                                                args.Player.SendErrorMessage("This users[0] doesn't have a suffix to remove.");
+                                                args.Player.SendErrorMessage("This user doesn't have a suffix to remove.");
                                                 return;
                                             }
                                             else
@@ -363,7 +363,7 @@ namespace UserSpecificFunctions
                                             }
                                             else if (!players.ContainsKey(users[0].ID) || players[users[0].ID].ChatColor == "000,000,000")
                                             {
-                                                args.Player.SendErrorMessage("This users[0] doesn't have a color to remove.");
+                                                args.Player.SendErrorMessage("This user doesn't have a color to remove.");
                                                 return;
                                             }
                                             else
@@ -408,9 +408,9 @@ namespace UserSpecificFunctions
                                 TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
                                 return;
                             }
-                            else if (players.ContainsKey(users[0].ID))
+                            else if (!players.ContainsKey(users[0].ID))
                             {
-                                args.Player.SendErrorMessage("This users[0] has no custom data to reset.");
+                                args.Player.SendErrorMessage("This user has no custom data to reset.");
                                 return;
                             }
                             else if (users[0].Name != args.Player.Name && !args.Player.Group.HasPermission(Permissions.setOther))
@@ -516,7 +516,7 @@ namespace UserSpecificFunctions
                         }
                         else if (Utils.CheckPerm(users[0].ID, permission))
                         {
-                            args.Player.SendInfoMessage("This users[0] already has this permission.");
+                            args.Player.SendInfoMessage("This user already has this permission.");
                             return;
                         }
                         else
@@ -552,7 +552,7 @@ namespace UserSpecificFunctions
                         }
                         else if (!Utils.CheckPerm(users[0].ID, permission))
                         {
-                            args.Player.SendInfoMessage("This users[0] does not have this permission.");
+                            args.Player.SendInfoMessage("This user does not have this permission.");
                             return;
                         }
                         else
@@ -583,7 +583,7 @@ namespace UserSpecificFunctions
                         }
                         else if (!players.ContainsKey(users[0].ID))
                         {
-                            args.Player.SendErrorMessage("This users[0] doesn't have any permissions to list.");
+                            args.Player.SendErrorMessage("This user doesn't have any permissions to list.");
                             return;
                         }
                         else
@@ -597,7 +597,7 @@ namespace UserSpecificFunctions
                                 {
                                     HeaderFormat = $"{users[0].Name.Suffix()} permissions:",
                                     FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, users[0].Name),
-                                    NothingToDisplayString = "This users[0] has no specific permissions to display."
+                                    NothingToDisplayString = "This user has no specific permissions to display."
                                 });
                         }
                     }
