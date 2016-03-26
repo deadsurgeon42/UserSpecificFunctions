@@ -14,18 +14,41 @@ namespace UserSpecificFunctions
     public static class Utils
     {
         #region User Checks
-        public static bool UserChecked(string userName)
-        {
-            List<User> users = TShock.Users.GetUsersByName(userName);
-            if (users.Count != 0 && users[0].Name == userName)
-                return true;
+        //public static bool UserChecked(string userName, List<User> users, TSPlayer receiver)
+        //{
+        //    if (users.Count != 0 && users[0].Name == userName)
+        //        return true;
 
-            if (users.Count == 0)
-                return false;
-            else if (users.Count > 1)
-                return false;
-            else
-                return true;
+        //    if (users.Count == 0)
+        //    {
+        //        receiver.SendErrorMessage($"No users matched {userName}.");
+        //        return false;
+        //    }
+        //    else if (users.Count > 1)
+        //    {
+        //        TShock.Utils.SendMultipleMatchError(receiver, users.Select(p => p.Name));
+        //        return false;
+        //    }
+        //    else
+        //        return true;
+        //}
+
+        public static List<User> GetUsers(string userName)
+        {
+            List<User> users = new List<User>();
+
+            foreach (User user in TShock.Users.GetUsers())
+            {
+                if (user != null)
+                {
+                    if (user.Name.Equals(userName))
+                        return new List<User> { user };
+                    else if (user.Name.ToLower().StartsWith(userName.ToLower()))
+                        users.Add(user);
+                }
+            }
+
+            return users;
         }
         #endregion
 

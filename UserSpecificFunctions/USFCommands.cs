@@ -110,40 +110,49 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                            if (user == null)
+                            string userName = args.Parameters[1];
+                            List<User> users = Utils.GetUsers(userName);
+                            if (users.Count == 0)
                             {
-                                args.Player.SendErrorMessage("Invalid user.");
+                                args.Player.SendErrorMessage($"No users under the name of {userName} were found...");
                                 return;
                             }
-                            else if (user.Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
+                            else if (users.Count > 1)
                             {
-                                args.Player.SendErrorMessage("You cannot modify this player's data.");
+                                TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
                                 return;
                             }
                             else
                             {
-                                args.Parameters.RemoveRange(0, 2);
-                                string prefix = string.Join(" ", args.Parameters.Select(x => x));
-
-                                foreach (string word in config.UnAllowedWords)
+                                if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
                                 {
-                                    if (prefix.Contains(word))
-                                    {
-                                        args.Player.SendErrorMessage($"You can't use '{word}' in your prefix.");
-                                        return;
-                                    }
-                                }
-
-                                if (prefix.Length > config.PrefixLength)
-                                {
-                                    args.Player.SendErrorMessage($"Your prefix cannot be longer than {config.PrefixLength} chars.");
+                                    args.Player.SendErrorMessage("You cannot modify this player's prefix!");
                                     return;
                                 }
                                 else
                                 {
-                                    Database.SetPrefix(user.ID, prefix);
-                                    args.Player.SendSuccessMessage($"Set {user.Name.Suffix()} prefix to '{prefix}'.");
+                                    args.Parameters.RemoveRange(0, 2);
+                                    string prefix = string.Join(" ", args.Parameters.Select(x => x));
+
+                                    foreach (string word in config.UnAllowedWords)
+                                    {
+                                        if (prefix.Contains(word))
+                                        {
+                                            args.Player.SendErrorMessage($"You can't use '{word}' in your prefix.");
+                                            return;
+                                        }
+                                    }
+
+                                    if (prefix.Length > config.PrefixLength)
+                                    {
+                                        args.Player.SendErrorMessage($"Your prefix cannot be longer than {config.PrefixLength} chars.");
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        Database.SetPrefix(users[0].ID, prefix);
+                                        args.Player.SendSuccessMessage($"Set {users[0].Name.Suffix()} prefix to '{prefix}'.");
+                                    }
                                 }
                             }
                         }
@@ -168,40 +177,49 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                            if (user == null)
+                            string userName = args.Parameters[1];
+                            List<User> users = Utils.GetUsers(userName);
+                            if (users.Count == 0)
                             {
-                                args.Player.SendErrorMessage("Invalid user.");
+                                args.Player.SendErrorMessage($"No users under the name of {userName} were found...");
                                 return;
                             }
-                            else if (user.Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
+                            else if (users.Count > 1)
                             {
-                                args.Player.SendErrorMessage("You cannot modify this player's data.");
+                                TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
                                 return;
                             }
                             else
                             {
-                                args.Parameters.RemoveRange(0, 2);
-                                string suffix = string.Join(" ", args.Parameters.Select(x => x));
-
-                                foreach (string word in config.UnAllowedWords)
+                                if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
                                 {
-                                    if (suffix.Contains(word))
-                                    {
-                                        args.Player.SendErrorMessage($"You can't use '{word}' in your suffix.");
-                                        return;
-                                    }
-                                }
-
-                                if (suffix.Length > config.SuffixLength)
-                                {
-                                    args.Player.SendErrorMessage($"Your suffix cannot be longer than {config.SuffixLength} chars.");
+                                    args.Player.SendErrorMessage("You cannot modify this player's suffix!");
                                     return;
                                 }
                                 else
                                 {
-                                    Database.SetSuffix(user.ID, suffix);
-                                    args.Player.SendSuccessMessage($"Set {user.Name.Suffix()} suffix to '{suffix}'.");
+                                    args.Parameters.RemoveRange(0, 2);
+                                    string suffix = string.Join(" ", args.Parameters.Select(x => x));
+
+                                    foreach (string word in config.UnAllowedWords)
+                                    {
+                                        if (suffix.Contains(word))
+                                        {
+                                            args.Player.SendErrorMessage($"You can't use '{word}' in your suffix.");
+                                            return;
+                                        }
+                                    }
+
+                                    if (suffix.Length > config.SuffixLength)
+                                    {
+                                        args.Player.SendErrorMessage($"Your suffix cannot be longer than {config.SuffixLength} chars.");
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        Database.SetSuffix(users[0].ID, suffix);
+                                        args.Player.SendSuccessMessage($"Set {users[0].Name.Suffix()} suffix to '{suffix}'.");
+                                    }
                                 }
                             }
                         }
@@ -226,31 +244,40 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                            if (user == null)
+                            string userName = args.Parameters[1];
+                            List<User> users = Utils.GetUsers(userName);
+                            if (users.Count == 0)
                             {
-                                args.Player.SendErrorMessage("Invalid user.");
+                                args.Player.SendErrorMessage($"No users under the name of {userName} were found...");
                                 return;
                             }
-                            else if (user.Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
+                            else if (users.Count > 1)
                             {
-                                args.Player.SendErrorMessage("You cannot modify this player's data.");
+                                TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
                                 return;
                             }
                             else
                             {
-                                args.Parameters.RemoveRange(0, 2);
-                                string color = string.Join(" ", args.Parameters.Select(x => x));
-                                string[] Color = color.Split(',');
-
-                                byte r, g, b;
-                                if (Color.Length == 3 && byte.TryParse(Color[0], out r) && byte.TryParse(Color[1], out g) && byte.TryParse(Color[2], out b))
+                                if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
                                 {
-                                    Database.SetColor(user.ID, color);
-                                    args.Player.SendSuccessMessage($"Set {user.Name.Suffix()} color to '{color}'.");
+                                    args.Player.SendErrorMessage("You cannot modify this player's color!");
+                                    return;
                                 }
                                 else
-                                    args.Player.SendErrorMessage("Invalid syntax: {0}us color <player name> <rrr,ggg,bbb> (values cannot be greater than 255)", TShock.Config.CommandSpecifier);
+                                {
+                                    args.Parameters.RemoveRange(0, 2);
+                                    string color = string.Join(" ", args.Parameters.Select(x => x));
+                                    string[] Color = color.Split(',');
+
+                                    byte r, g, b;
+                                    if (Color.Length == 3 && byte.TryParse(Color[0], out r) && byte.TryParse(Color[1], out g) && byte.TryParse(Color[2], out b))
+                                    {
+                                        Database.SetColor(users[0].ID, color);
+                                        args.Player.SendSuccessMessage($"Set {users[0].Name.Suffix()} color to '{color}'.");
+                                    }
+                                    else
+                                        args.Player.SendErrorMessage("Invalid syntax: {0}us color <player name> <rrr,ggg,bbb> (values cannot be greater than 255)", TShock.Config.CommandSpecifier);
+                                }
                             }
                         }
                     }
@@ -269,13 +296,18 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                            if (user == null)
+                            List<User> users = Utils.GetUsers(args.Parameters[1]);
+                            if (users.Count == 0)
                             {
-                                args.Player.SendErrorMessage("Invalid user.");
+                                args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
                                 return;
                             }
-                            else if (user.Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
+                            else if (users.Count > 1)
+                            {
+                                TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
+                                return;
+                            }
+                            else if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
                             {
                                 args.Player.SendErrorMessage("You can't modify this player's data.");
                                 return;
@@ -291,15 +323,15 @@ namespace UserSpecificFunctions
                                                 args.Player.SendErrorMessage("You don't have access to this command.");
                                                 return;
                                             }
-                                            else if (!players.ContainsKey(user.ID) || players[user.ID].Prefix == null)
+                                            else if (!players.ContainsKey(users[0].ID) || players[users[0].ID].Prefix == null)
                                             {
-                                                args.Player.SendErrorMessage("This user doesn't have a prefix to remove.");
+                                                args.Player.SendErrorMessage("This users[0] doesn't have a prefix to remove.");
                                                 return;
                                             }
                                             else
                                             {
-                                                Database.SetPrefix(user.ID);
-                                                args.Player.SendSuccessMessage($"Removed {user.Name.Suffix()} prefix.");
+                                                Database.SetPrefix(users[0].ID);
+                                                args.Player.SendSuccessMessage($"Removed {users[0].Name.Suffix()} prefix.");
                                             }
                                         }
                                         break;
@@ -310,15 +342,15 @@ namespace UserSpecificFunctions
                                                 args.Player.SendErrorMessage("You don't have access to this command.");
                                                 return;
                                             }
-                                            else if (!players.ContainsKey(user.ID) || players[user.ID].Suffix == null)
+                                            else if (!players.ContainsKey(users[0].ID) || players[users[0].ID].Suffix == null)
                                             {
-                                                args.Player.SendErrorMessage("This user doesn't have a suffix to remove.");
+                                                args.Player.SendErrorMessage("This users[0] doesn't have a suffix to remove.");
                                                 return;
                                             }
                                             else
                                             {
-                                                Database.SetSuffix(user.ID);
-                                                args.Player.SendSuccessMessage($"Removed {user.Name.Suffix()} suffix.");
+                                                Database.SetSuffix(users[0].ID);
+                                                args.Player.SendSuccessMessage($"Removed {users[0].Name.Suffix()} suffix.");
                                             }
                                         }
                                         break;
@@ -329,15 +361,15 @@ namespace UserSpecificFunctions
                                                 args.Player.SendErrorMessage("You don't have access to this command.");
                                                 return;
                                             }
-                                            else if (!players.ContainsKey(user.ID) || players[user.ID].ChatColor == "000,000,000")
+                                            else if (!players.ContainsKey(users[0].ID) || players[users[0].ID].ChatColor == "000,000,000")
                                             {
-                                                args.Player.SendErrorMessage("This user doesn't have a color to remove.");
+                                                args.Player.SendErrorMessage("This users[0] doesn't have a color to remove.");
                                                 return;
                                             }
                                             else
                                             {
-                                                Database.SetColor(user.ID);
-                                                args.Player.SendSuccessMessage($"Removed {user.Name.Suffix()} color.");
+                                                Database.SetColor(users[0].ID);
+                                                args.Player.SendSuccessMessage($"Removed {users[0].Name.Suffix()} color.");
                                             }
                                         }
                                         break;
@@ -365,26 +397,31 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                            if (user == null)
+                            List<User> users = Utils.GetUsers(args.Parameters[1]);
+                            if (users.Count == 0)
                             {
-                                args.Player.SendErrorMessage("Invalid user.");
+                                args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
                                 return;
                             }
-                            else if (players.ContainsKey(user.ID))
+                            else if (users.Count > 1)
                             {
-                                args.Player.SendErrorMessage("This user has no custom data to reset.");
+                                TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
                                 return;
                             }
-                            else if (user.Name != args.Player.Name && !args.Player.Group.HasPermission(Permissions.setOther))
+                            else if (players.ContainsKey(users[0].ID))
+                            {
+                                args.Player.SendErrorMessage("This users[0] has no custom data to reset.");
+                                return;
+                            }
+                            else if (users[0].Name != args.Player.Name && !args.Player.Group.HasPermission(Permissions.setOther))
                             {
                                 args.Player.SendErrorMessage("You can't modify this player's data.");
                                 return;
                             }
                             else
                             {
-                                Database.ResetPlayerData(user.ID);
-                                args.Player.SendErrorMessage($"Reset {user.Name.Suffix()} data.");
+                                Database.ResetPlayerData(users[0].ID);
+                                args.Player.SendErrorMessage($"Reset {users[0].Name.Suffix()} data.");
                             }
                         }
                     }
@@ -411,28 +448,33 @@ namespace UserSpecificFunctions
                             return;
                         }
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
+                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        if (users.Count == 0)
                         {
-                            args.Player.SendErrorMessage("Invalid user.");
+                            args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
                             return;
                         }
-                        else if (user.Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.readOther))
+                        else if (users.Count > 1)
+                        {
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
+                            return;
+                        }
+                        else if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.readOther))
                         {
                             args.Player.SendErrorMessage("You can't read this player's data.");
                             return;
                         }
-                        else if (!players.ContainsKey(user.ID))
+                        else if (!players.ContainsKey(users[0].ID))
                         {
-                            args.Player.SendErrorMessage("This user doesn't have any data to read.");
+                            args.Player.SendErrorMessage("This users[0] doesn't have any data to read.");
                             return;
                         }
                         else
                         {
-                            args.Player.SendMessage($"Username: {user.Name}", Color.LawnGreen);
-                            args.Player.SendMessage($"Prefix: {players[user.ID].Prefix?.ToString() ?? "None"}", Color.LawnGreen);
-                            args.Player.SendMessage($"Suffix: {players[user.ID].Suffix?.ToString() ?? "None"}", Color.LawnGreen);
-                            args.Player.SendMessage($"Color: {(players[user.ID].ChatColor == "000,000,000" ? "None" : players[user.ID].ChatColor)}", Color.LawnGreen);
+                            args.Player.SendMessage($"users[0]name: {users[0].Name}", Color.LawnGreen);
+                            args.Player.SendMessage($"Prefix: {players[users[0].ID].Prefix?.ToString() ?? "None"}", Color.LawnGreen);
+                            args.Player.SendMessage($"Suffix: {players[users[0].ID].Suffix?.ToString() ?? "None"}", Color.LawnGreen);
+                            args.Player.SendMessage($"Color: {(players[users[0].ID].ChatColor == "000,000,000" ? "None" : players[users[0].ID].ChatColor)}", Color.LawnGreen);
                         }
                     }
                     break;
@@ -461,21 +503,26 @@ namespace UserSpecificFunctions
 
                         string permission = string.Join(" ", args.Parameters[2]);
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
+                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        if (users.Count == 0)
                         {
-                            args.Player.SendErrorMessage("Invalid user.");
+                            args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
                             return;
                         }
-                        else if (Utils.CheckPerm(user.ID, permission))
+                        else if (users.Count > 1)
                         {
-                            args.Player.SendInfoMessage("This user already has this permission.");
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
+                            return;
+                        }
+                        else if (Utils.CheckPerm(users[0].ID, permission))
+                        {
+                            args.Player.SendInfoMessage("This users[0] already has this permission.");
                             return;
                         }
                         else
                         {
-                            Database.ModifyPermissions(user.ID, permission);
-                            args.Player.SendSuccessMessage($"Modified {user.Name.Suffix()} permissions successfully.");
+                            Database.ModifyPermissions(users[0].ID, permission);
+                            args.Player.SendSuccessMessage($"Modified {users[0].Name.Suffix()} permissions successfully.");
                         }
                     }
                     return;
@@ -492,21 +539,26 @@ namespace UserSpecificFunctions
 
                         string permission = string.Join(" ", args.Parameters[2]);
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
+                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        if (users.Count == 0)
                         {
-                            args.Player.SendErrorMessage("Invalid user.");
+                            args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
                             return;
                         }
-                        else if (!Utils.CheckPerm(user.ID, permission))
+                        else if (users.Count > 1)
                         {
-                            args.Player.SendInfoMessage("This user does not have this permission.");
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
+                            return;
+                        }
+                        else if (!Utils.CheckPerm(users[0].ID, permission))
+                        {
+                            args.Player.SendInfoMessage("This users[0] does not have this permission.");
                             return;
                         }
                         else
                         {
-                            Database.ModifyPermissions(user.ID, permission, true);
-                            args.Player.SendSuccessMessage($"Modified {user.Name.Suffix()} permissions successfully.");
+                            Database.ModifyPermissions(users[0].ID, permission, true);
+                            args.Player.SendSuccessMessage($"Modified {users[0].Name.Suffix()} permissions successfully.");
                         }
                     }
                     return;
@@ -518,15 +570,20 @@ namespace UserSpecificFunctions
                             return;
                         }
 
-                        User user = TShock.Users.GetUserByName(args.Parameters[1]);
-                        if (user == null)
+                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        if (users.Count == 0)
                         {
-                            args.Player.SendErrorMessage("Invalid user.");
+                            args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
                             return;
                         }
-                        else if (!players.ContainsKey(user.ID))
+                        else if (users.Count > 1)
                         {
-                            args.Player.SendErrorMessage("This user doesn't have any permissions to list.");
+                            TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
+                            return;
+                        }
+                        else if (!players.ContainsKey(users[0].ID))
+                        {
+                            args.Player.SendErrorMessage("This users[0] doesn't have any permissions to list.");
                             return;
                         }
                         else
@@ -535,12 +592,12 @@ namespace UserSpecificFunctions
                             if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out pageNum))
                                 return;
 
-                            PaginationTools.SendPage(args.Player, pageNum, PaginationTools.BuildLinesFromTerms(Utils.ListCommands(user.ID)),
+                            PaginationTools.SendPage(args.Player, pageNum, PaginationTools.BuildLinesFromTerms(Utils.ListCommands(users[0].ID)),
                                 new PaginationTools.Settings
                                 {
-                                    HeaderFormat = $"{user.Name.Suffix()} permissions:",
-                                    FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, user.Name),
-                                    NothingToDisplayString = "This user has no specific permissions to display."
+                                    HeaderFormat = $"{users[0].Name.Suffix()} permissions:",
+                                    FooterFormat = "Type {0}permission list {1} {{0}} for more.".SFormat(TShock.Config.CommandSpecifier, users[0].Name),
+                                    NothingToDisplayString = "This users[0] has no specific permissions to display."
                                 });
                         }
                     }
