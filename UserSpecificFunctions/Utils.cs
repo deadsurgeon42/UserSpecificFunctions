@@ -13,6 +13,23 @@ namespace UserSpecificFunctions
 {
     public static class Utils
     {
+        #region User Checks
+        public static bool UserChecked(string userName)
+        {
+            List<User> users = TShock.Users.GetUsersByName(userName);
+            if (users.Count != 0 && users[0].Name == userName)
+                return true;
+
+            if (users.Count == 0)
+                return false;
+            else if (users.Count > 1)
+                return false;
+            else
+                return true;
+        }
+        #endregion
+
+        #region Permission Related
         public static bool CheckPerm(int userid, string permission)
         {
             if (TShock.Users.GetUserByID(userid) != null && players.ContainsKey(userid))
@@ -34,7 +51,9 @@ namespace UserSpecificFunctions
 
             return permissions;
         }
+        #endregion
 
+        #region Command Related
         public static bool RunCommand(Command command, string msg, TSPlayer tsPlayer, List<string> args)
         {
             try
@@ -105,5 +124,6 @@ namespace UserSpecificFunctions
 
             return true;
         }
+        #endregion
     }
 }

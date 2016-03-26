@@ -70,7 +70,7 @@ namespace UserSpecificFunctions
 
                     foreach (string permission in permissions)
                     {
-                        if (permission != null)
+                        if (!string.IsNullOrWhiteSpace(permission))
                             playerPermissions.Add(permission);
                     }
 

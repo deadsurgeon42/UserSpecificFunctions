@@ -200,7 +200,7 @@ namespace UserSpecificFunctions
                                 }
                                 else
                                 {
-                                    Database.SetPrefix(user.ID, suffix);
+                                    Database.SetSuffix(user.ID, suffix);
                                     args.Player.SendSuccessMessage($"Set {user.Name.Suffix()} suffix to '{suffix}'.");
                                 }
                             }
