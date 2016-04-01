@@ -17,7 +17,7 @@ namespace UserSpecificFunctions
     {
         public static IDbConnection db;
 
-        public static void InitDB()
+        internal static void DBConnect()
         {
             switch (TShock.Config.StorageType.ToLower())
             {
@@ -39,7 +39,6 @@ namespace UserSpecificFunctions
                     string sql = Path.Combine(TShock.SavePath, "tshock.sqlite");
                     db = new SqliteConnection(string.Format("uri=file://{0},Version=3", sql));
                     break;
-
             }
 
             SqlTableCreator sqlcreator = new SqlTableCreator(db, db.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());

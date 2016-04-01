@@ -14,3 +14,10 @@ C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.csprojResolveAssemblyReference.cache
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.dll
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\obj\Debug\UserSpecificFunctions.pdb
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\MySql.Data.dll
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TerrariaServer.exe
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TShockAPI.dll
+C:\Users\sasa\Desktop\tshock_4.3.12\ServerPlugins\UserSpecificFunctions.dll
+C:\Users\sasa\Desktop\tshock_4.3.12\ServerPlugins\UserSpecificFunctions.pdb
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\Mono.Data.Sqlite.dll
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\Newtonsoft.Json.dll

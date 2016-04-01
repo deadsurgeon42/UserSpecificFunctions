@@ -14,25 +14,6 @@ namespace UserSpecificFunctions
     public static class Utils
     {
         #region User Checks
-        //public static bool UserChecked(string userName, List<User> users, TSPlayer receiver)
-        //{
-        //    if (users.Count != 0 && users[0].Name == userName)
-        //        return true;
-
-        //    if (users.Count == 0)
-        //    {
-        //        receiver.SendErrorMessage($"No users matched {userName}.");
-        //        return false;
-        //    }
-        //    else if (users.Count > 1)
-        //    {
-        //        TShock.Utils.SendMultipleMatchError(receiver, users.Select(p => p.Name));
-        //        return false;
-        //    }
-        //    else
-        //        return true;
-        //}
-
         public static List<User> GetUsers(string userName)
         {
             List<User> users = new List<User>();

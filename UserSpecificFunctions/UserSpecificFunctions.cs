@@ -56,7 +56,7 @@ namespace UserSpecificFunctions
         private void OnInitialize(EventArgs args)
         {
             LoadConfig();
-            Database.InitDB();
+            Database.DBConnect();
             Database.LoadDatabase();
 
             Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
@@ -80,10 +80,33 @@ namespace UserSpecificFunctions
                 string suffix = players[tsplr.User.ID].Suffix == null ? tsplr.Group.Suffix : players[tsplr.User.ID].Suffix;
                 Color color = players[tsplr.User.ID].ChatColor == "000,000,000" ? new Color(tsplr.Group.R, tsplr.Group.G, tsplr.Group.B) : players[tsplr.User.ID].ChatColor.ToColor();
 
-                TSPlayer.All.SendMessage(string.Format(TShock.Config.ChatFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix, args.Text), color);
-                TSPlayer.Server.SendMessage(string.Format(TShock.Config.ChatFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix, args.Text), color);
+                if (!TShock.Config.EnableChatAboveHeads)
+                {
+                    string msg = string.Format(TShock.Config.ChatFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix, args.Text);
+                    TSPlayer.All.SendMessage(msg, color);
+                    TSPlayer.Server.SendMessage(msg, color);
+                    TShock.Log.Info("Broadcast: {0}", msg);
 
-                args.Handled = true;
+                    args.Handled = true;
+                }
+                else
+                {
+                    Player ply = Main.player[args.Who];
+                    string name = ply.name;
+                    ply.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Name, prefix, tsplr.Name, suffix);
+                    NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, ply.name, args.Who, 0, 0, 0, 0);
+                    ply.name = name;
+                    var text = args.Text;
+                    NetMessage.SendData((int)PacketTypes.ChatText, -1, args.Who, text, args.Who, color.R, color.G, color.B);
+                    NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, name, args.Who, 0, 0, 0, 0);
+
+                    string msg = String.Format("<{0}> {1}", String.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix), text);
+                    tsplr.SendMessage(msg, color);
+                    TSPlayer.Server.SendMessage(msg, color);
+                    TShock.Log.Info("Broadcast: {0}", msg);
+
+                    args.Handled = true;
+                }
             }
 
             else if (args.Text.StartsWith(TShock.Config.CommandSpecifier) || args.Text.StartsWith(TShock.Config.CommandSilentSpecifier)
