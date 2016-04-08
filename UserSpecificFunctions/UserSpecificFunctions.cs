@@ -18,7 +18,7 @@ namespace UserSpecificFunctions
         public override string Name { get { return "User Specific Functions"; } }
         public override string Author { get { return "Professor X"; } }
         public override string Description { get { return ""; } }
-        public override Version Version { get { return new Version(1, 0, 0, 0); } }
+        public override Version Version { get { return new Version(1, 2, 1, 0); } }
 
         internal static Config config = new Config();
         internal static Dictionary<int, USFPlayer> players = new Dictionary<int, USFPlayer>();
