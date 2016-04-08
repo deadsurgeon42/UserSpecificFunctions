@@ -14,7 +14,7 @@ namespace UserSpecificFunctions
     public static class Utils
     {
         #region User Checks
-        public static List<User> GetUsers(string userName)
+        public static List<User> GetUsersByName(string userName)
         {
             List<User> users = new List<User>();
 

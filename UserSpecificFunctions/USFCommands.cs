@@ -111,7 +111,7 @@ namespace UserSpecificFunctions
                         else
                         {
                             string userName = args.Parameters[1];
-                            List<User> users = Utils.GetUsers(userName);
+                            List<User> users = Utils.GetUsersByName(userName);
                             if (users.Count == 0)
                             {
                                 args.Player.SendErrorMessage($"No users under the name of {userName} were found...");
@@ -178,7 +178,7 @@ namespace UserSpecificFunctions
                         else
                         {
                             string userName = args.Parameters[1];
-                            List<User> users = Utils.GetUsers(userName);
+                            List<User> users = Utils.GetUsersByName(userName);
                             if (users.Count == 0)
                             {
                                 args.Player.SendErrorMessage($"No users under the name of {userName} were found...");
@@ -245,7 +245,7 @@ namespace UserSpecificFunctions
                         else
                         {
                             string userName = args.Parameters[1];
-                            List<User> users = Utils.GetUsers(userName);
+                            List<User> users = Utils.GetUsersByName(userName);
                             if (users.Count == 0)
                             {
                                 args.Player.SendErrorMessage($"No users under the name of {userName} were found...");
@@ -296,7 +296,7 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            List<User> users = Utils.GetUsers(args.Parameters[1]);
+                            List<User> users = Utils.GetUsersByName(args.Parameters[1]);
                             if (users.Count == 0)
                             {
                                 args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
@@ -397,7 +397,7 @@ namespace UserSpecificFunctions
                         }
                         else
                         {
-                            List<User> users = Utils.GetUsers(args.Parameters[1]);
+                            List<User> users = Utils.GetUsersByName(args.Parameters[1]);
                             if (users.Count == 0)
                             {
                                 args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
@@ -448,7 +448,7 @@ namespace UserSpecificFunctions
                             return;
                         }
 
-                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        List<User> users = Utils.GetUsersByName(args.Parameters[1]);
                         if (users.Count == 0)
                         {
                             args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
@@ -503,7 +503,7 @@ namespace UserSpecificFunctions
 
                         string permission = string.Join(" ", args.Parameters[2]);
 
-                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        List<User> users = Utils.GetUsersByName(args.Parameters[1]);
                         if (users.Count == 0)
                         {
                             args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
@@ -539,7 +539,7 @@ namespace UserSpecificFunctions
 
                         string permission = string.Join(" ", args.Parameters[2]);
 
-                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        List<User> users = Utils.GetUsersByName(args.Parameters[1]);
                         if (users.Count == 0)
                         {
                             args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");
@@ -570,7 +570,7 @@ namespace UserSpecificFunctions
                             return;
                         }
 
-                        List<User> users = Utils.GetUsers(args.Parameters[1]);
+                        List<User> users = Utils.GetUsersByName(args.Parameters[1]);
                         if (users.Count == 0)
                         {
                             args.Player.SendErrorMessage($"No users under the name of {args.Parameters[1]} were found...");

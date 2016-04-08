@@ -21,8 +21,6 @@ namespace UserSpecificFunctions
         public override Version Version { get { return new Version(1, 0, 0, 0); } }
 
         internal static Config config = new Config();
-        internal static string configPath = Path.Combine(TShock.SavePath, "UserSpecificFunctions.json");
-
         internal static Dictionary<int, USFPlayer> players = new Dictionary<int, USFPlayer>();
 
         public UserSpecificFunctions(Main game) : base(game)
@@ -93,7 +91,7 @@ namespace UserSpecificFunctions
                 {
                     Player ply = Main.player[args.Who];
                     string name = ply.name;
-                    ply.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Name, prefix, tsplr.Name, suffix);
+                    ply.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix);
                     NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, ply.name, args.Who, 0, 0, 0, 0);
                     ply.name = name;
                     var text = args.Text;
@@ -141,6 +139,7 @@ namespace UserSpecificFunctions
         #region LoadConfig
         internal static void LoadConfig()
         {
+            string configPath = Path.Combine(TShock.SavePath, "UserSpecificFunctions.json");
             (config = config.Read(configPath)).Write(configPath);
         }
         #endregion
