@@ -8,13 +8,13 @@ using UserSpecificFunctions.Extensions;
 
 namespace UserSpecificFunctions
 {
-    public class PlayerInfo
-    {
-        public int UserID { get; set; }
-        public string Prefix { get; set; }
-        public string Suffix { get; set; }
-        public string ChatColor { get; set; }
-        public List<string> Permissions { get; set; }
+	public class PlayerInfo
+	{
+		public int UserID { get; set; }
+		public string Prefix { get; set; }
+		public string Suffix { get; set; }
+		public string ChatColor { get; set; }
+		public List<string> Permissions { get; set; }
 
 		public bool HasPermission(string permission)
 		{
@@ -47,5 +47,5 @@ namespace UserSpecificFunctions
 			ChatColor = null;
 			Permissions = null;
 		}
-    }
+	}
 }
