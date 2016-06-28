@@ -35,7 +35,7 @@ namespace UserSpecificFunctions
 			UserID = reader.Get<int>("UserID");
 			Prefix = reader.Get<string>("Prefix");
 			Suffix = reader.Get<string>("Suffix");
-			ChatColor = reader.Get<string>("ChatColor");
+			ChatColor = reader.Get<string>("Color");
 			Permissions = reader.Get<string>("Permissions").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 		}
 
