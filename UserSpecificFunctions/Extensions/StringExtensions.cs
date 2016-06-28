@@ -8,7 +8,7 @@ namespace UserSpecificFunctions.Extensions
 {
     public static class StringExtensions
     {
-        public static string Suffix(this string source)
+        public static string SuffixPossesion(this string source)
         {
             return source + (source.EndsWith("s") ? "'" : "'s");
         }

@@ -12,136 +12,145 @@ using UserSpecificFunctions.Extensions;
 
 namespace UserSpecificFunctions
 {
-    [ApiVersion(1, 22)]
-    public class UserSpecificFunctions : TerrariaPlugin
-    {
-        public override string Name { get { return "User Specific Functions"; } }
-        public override string Author { get { return "Professor X"; } }
-        public override string Description { get { return ""; } }
-        public override Version Version { get { return new Version(1, 2, 1, 0); } }
+	[ApiVersion(1, 23)]
+	public class UserSpecificFunctions : TerrariaPlugin
+	{
+		public override string Name { get { return "User Specific Functions"; } }
+		public override string Author { get { return "Professor X"; } }
+		public override string Description { get { return ""; } }
+		public override Version Version { get { return new Version(1, 3, 2, 0); } }
 
-        internal static Config config = new Config();
-        internal static Dictionary<int, USFPlayer> players = new Dictionary<int, USFPlayer>();
+		public static Config USFConfig = new Config();
+		public static Database USFDatabase = new Database();
 
-        public UserSpecificFunctions(Main game) : base(game)
-        {
+		public UserSpecificFunctions(Main game) : base(game)
+		{
 
-        }
+		}
 
-        #region Initialize/Dispose
-        public override void Initialize()
-        {
-            ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
-            ServerApi.Hooks.ServerChat.Register(this, OnChat);
+		#region Initialize/Dispose
+		public override void Initialize()
+		{
+			ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
+			ServerApi.Hooks.ServerChat.Register(this, OnChat);
 
-            GeneralHooks.ReloadEvent += OnReload;
-        }
+			PlayerHooks.PlayerPermission += OnPlayerPermission;
+			GeneralHooks.ReloadEvent += OnReload;
+		}
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
-                ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
+				ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
 
-                GeneralHooks.ReloadEvent -= OnReload;
-            }
-            base.Dispose(disposing);
-        }
-        #endregion
+				PlayerHooks.PlayerPermission -= OnPlayerPermission;
+				GeneralHooks.ReloadEvent -= OnReload;
+			}
+			base.Dispose(disposing);
+		}
+		#endregion
 
-        #region Hooks
-        private void OnInitialize(EventArgs args)
-        {
-            LoadConfig();
-            Database.DBConnect();
-            Database.LoadDatabase();
+		#region Hooks
+		private void OnInitialize(EventArgs args)
+		{
+			LoadConfig();
+			Database.DBConnect();
 
-            Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
+			Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
 
-            Commands.ChatCommands.Add(new Command(USFCommands.Help, "help") { HelpText = "Lists commands or gives help on them." });
-            Commands.ChatCommands.Add(new Command(USFCommands.USFMain, "us"));
-            Commands.ChatCommands.Add(new Command(Permissions.setPermissions, USFCommands.USFPermission, "permission"));
-        }
+			Commands.ChatCommands.Add(new Command(USFCommands.Help, "help") { HelpText = "Lists commands or gives help on them." });
+			Commands.ChatCommands.Add(new Command(USFCommands.USFMain, "us"));
+			Commands.ChatCommands.Add(new Command(Permissions.setPermissions, USFCommands.USFPermission, "permission"));
+		}
 
-        private void OnChat(ServerChatEventArgs args)
-        {
-            if (args.Handled)
-                return;
+		private void OnChat(ServerChatEventArgs args)
+		{
+			if (args.Handled)
+				return;
 
-            TSPlayer tsplr = TShock.Players[args.Who];
+			TSPlayer tsplr = TShock.Players[args.Who];
+			if (tsplr == null || tsplr.GetPlayerInfo() == null)
+				return;
 
-            if (!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier)
-                && !tsplr.mute && tsplr.IsLoggedIn && players.ContainsKey(tsplr.User.ID))
-            {
-                string prefix = players[tsplr.User.ID].Prefix == null ? tsplr.Group.Prefix : players[tsplr.User.ID].Prefix;
-                string suffix = players[tsplr.User.ID].Suffix == null ? tsplr.Group.Suffix : players[tsplr.User.ID].Suffix;
-                Color color = players[tsplr.User.ID].ChatColor == "000,000,000" ? new Color(tsplr.Group.R, tsplr.Group.G, tsplr.Group.B) : players[tsplr.User.ID].ChatColor.ToColor();
+			if (!tsplr.HasPermission(TShockAPI.Permissions.canchat) || tsplr.mute)
+				return;
 
-                if (!TShock.Config.EnableChatAboveHeads)
-                {
-                    string msg = string.Format(TShock.Config.ChatFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix, args.Text);
-                    TSPlayer.All.SendMessage(msg, color);
-                    TSPlayer.Server.SendMessage(msg, color);
-                    TShock.Log.Info("Broadcast: {0}", msg);
+			if (!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier))
+			{
+				string prefix = tsplr.GetPlayerInfo().Prefix?.ToString() ?? tsplr.Group.Prefix;
+				string suffix = tsplr.GetPlayerInfo().Suffix?.ToString() ?? tsplr.Group.Suffix;
+				Color chatColor = tsplr.GetPlayerInfo().ChatColor?.ToColor() ?? tsplr.Group.ChatColor.ToColor();
 
-                    args.Handled = true;
-                }
-                else
-                {
-                    Player ply = Main.player[args.Who];
-                    string name = ply.name;
-                    ply.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix);
-                    NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, ply.name, args.Who, 0, 0, 0, 0);
-                    ply.name = name;
-                    var text = args.Text;
-                    NetMessage.SendData((int)PacketTypes.ChatText, -1, args.Who, text, args.Who, color.R, color.G, color.B);
-                    NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, name, args.Who, 0, 0, 0, 0);
+				if (!TShock.Config.EnableChatAboveHeads)
+				{
+					string message = string.Format(TShock.Config.ChatFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix, args.Text);
+					TSPlayer.All.SendMessage(message, chatColor);
+					TSPlayer.Server.SendMessage(message, chatColor);
+					TShock.Log.Info("Broadcast: {0}", message);
 
-                    string msg = String.Format("<{0}> {1}", String.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix), text);
-                    tsplr.SendMessage(msg, color);
-                    TSPlayer.Server.SendMessage(msg, color);
-                    TShock.Log.Info("Broadcast: {0}", msg);
+					args.Handled = true;
+				}
+				else
+				{
+					Player player = Main.player[args.Who];
+					string name = player.name;
+					player.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix);
+					NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, player.name, args.Who, 0, 0, 0, 0);
+					player.name = name;
+					var text = args.Text;
+					NetMessage.SendData((int)PacketTypes.ChatText, -1, args.Who, text, args.Who, chatColor.R, chatColor.G, chatColor.B);
+					NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, name, args.Who, 0, 0, 0, 0);
 
-                    args.Handled = true;
-                }
-            }
+					string message = string.Format("<{0}> {1}", string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix), text);
+					tsplr.SendMessage(message, chatColor);
+					TSPlayer.Server.SendMessage(message, chatColor);
+					TShock.Log.Info("Broadcast: {0}", message);
 
-            else if (args.Text.StartsWith(TShock.Config.CommandSpecifier) || args.Text.StartsWith(TShock.Config.CommandSilentSpecifier)
-                && !string.IsNullOrWhiteSpace(args.Text.Substring(1)))
-            {
-                try
-                {
-                    if (tsplr.User != null && players.ContainsKey(tsplr.User.ID))
-                    {
-                        args.Handled = Utils.ExecuteComamnd(tsplr, args.Text);
-                    }
-                    else
-                    {
-                        args.Handled = Commands.HandleCommand(tsplr, args.Text);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TShock.Log.ConsoleError("An exception occured executing a command.");
-                    TShock.Log.Error(ex.ToString());
-                }
-            }
-        }
+					args.Handled = true;
+				}
+			}
+			else
+			{
+				if (!string.IsNullOrWhiteSpace(args.Text.Substring(1)))
+				{
+					try
+					{
+						args.Handled = Utils.ExecuteComamnd(tsplr, args.Text);
+					}
+					catch (Exception ex)
+					{
+						TShock.Log.ConsoleError("An exception occured executing a command.");
+						TShock.Log.Error(ex.ToString());
+					}
+				}
+			}
+		}
 
-        private void OnReload(ReloadEventArgs args)
-        {
-            LoadConfig();
-            Database.LoadDatabase();
-        }
-        #endregion
+		private void OnPlayerPermission(PlayerPermissionEventArgs args)
+		{
+			if (args.Handled)
+				return;
 
-        #region LoadConfig
-        internal static void LoadConfig()
-        {
-            string configPath = Path.Combine(TShock.SavePath, "UserSpecificFunctions.json");
-            (config = config.Read(configPath)).Write(configPath);
-        }
-        #endregion
-    }
+			if (args.Player == null || args.Player.GetPlayerInfo() == null)
+				return;
+
+			args.Handled = args.Player.GetPlayerInfo().HasPermission(args.Permission);
+		}
+
+		private void OnReload(ReloadEventArgs args)
+		{
+			LoadConfig();
+		}
+		#endregion
+
+		#region LoadConfig
+		internal static void LoadConfig()
+		{
+			string configPath = Path.Combine(TShock.SavePath, "UserSpecificFunctions.json");
+			USFConfig = Config.Read(configPath);
+		}
+		#endregion
+	}
 }

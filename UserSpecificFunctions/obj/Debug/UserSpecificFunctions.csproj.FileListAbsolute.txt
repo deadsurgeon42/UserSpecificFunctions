@@ -21,3 +21,8 @@ C:\Users\sasa\Desktop\tshock_4.3.12\ServerPlugins\UserSpecificFunctions.dll
 C:\Users\sasa\Desktop\tshock_4.3.12\ServerPlugins\UserSpecificFunctions.pdb
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\Mono.Data.Sqlite.dll
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\Newtonsoft.Json.dll
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TShockAPI.pdb
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\TShockAPI.xml
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.pdb
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.xml
+C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\BCrypt.Net.xml
