@@ -11,9 +11,9 @@ namespace UserSpecificFunctions
 {
     public class Config
     {
-        public int PrefixLength = 20;
-        public int SuffixLength = 20;
-        public string[] UnAllowedWords = new string[] { "Ass", "Asshole", "Fuck", "Fucktard", "Shit", "Shithead", "Fucker", "Motherfucker" };
+		public int PrefixLength = 20;
+		public int SuffixLength = 20;
+		public string[] UnAllowedWords = new string[] { "Ass", "Asshole", "Fuck", "Fucktard", "Shit", "Shithead", "Fucker", "Motherfucker" };
 
 		public static Config Read(string path)
 		{
@@ -26,5 +26,5 @@ namespace UserSpecificFunctions
 
 			return JsonConvert.DeserializeObject<Config>(File.ReadAllText(path));
 		}
-    }
+	}
 }

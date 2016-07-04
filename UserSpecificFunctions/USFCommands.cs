@@ -172,6 +172,12 @@ namespace UserSpecificFunctions
 				return;
 			}
 
+			if (!args.Player.HasPermission(Permissions.setPrefix))
+			{
+				args.Player.SendErrorMessage("You don't have access to this command.");
+				return;
+			}
+
 			if (args.Parameters.Count < 3)
 			{
 				args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}us prefix <player name> <prefix>", TShock.Config.CommandSpecifier);
@@ -234,6 +240,12 @@ namespace UserSpecificFunctions
 			if (!args.Player.IsLoggedIn && args.Player.RealPlayer)
 			{
 				args.Player.SendErrorMessage("You must be logged in to do that.");
+				return;
+			}
+
+			if (!args.Player.HasPermission(Permissions.setSuffix))
+			{
+				args.Player.SendErrorMessage("You don't have access to this command.");
 				return;
 			}
 

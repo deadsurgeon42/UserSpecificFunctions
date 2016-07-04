@@ -10,7 +10,7 @@ namespace UserSpecificFunctions.Extensions
 	{
 		public static bool Negated(this List<string> permissions, string permission)
 		{
-			if (permissions.Contains(permission) && permission.StartsWith("!"))
+			if (permission.StartsWith("!") && permissions.Contains(permission))
 				return true;
 
 			return false;
