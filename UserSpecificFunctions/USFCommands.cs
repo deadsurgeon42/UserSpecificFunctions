@@ -396,6 +396,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
+				PlayerInfo player = await USFDatabase.GetPlayerAsync(users[0].ID);
 				switch (args.Parameters[2].ToLower())
 				{
 					case "prefix":
@@ -405,7 +406,7 @@ namespace UserSpecificFunctions
 								args.Player.SendErrorMessage("You don't have access to this command.");
 								return;
 							}
-							else if (USFDatabase.GetPlayer(users[0].ID) == null)
+							else if (player == null || player.Prefix == null)
 							{
 								args.Player.SendErrorMessage("This user does not have a prefix to remove.");
 								return;
@@ -430,7 +431,7 @@ namespace UserSpecificFunctions
 								args.Player.SendErrorMessage("You don't have access to this command.");
 								return;
 							}
-							else if (USFDatabase.GetPlayer(users[0].ID) == null || USFDatabase.GetPlayer(users[0].ID).Suffix == null)
+							else if (player == null || player.Suffix == null)
 							{
 								args.Player.SendErrorMessage("This user does not have a suffix to remove.");
 								return;
@@ -455,7 +456,7 @@ namespace UserSpecificFunctions
 								args.Player.SendErrorMessage("You don't have access to this command.");
 								return;
 							}
-							else if (USFDatabase.GetPlayer(users[0].ID) == null || USFDatabase.GetPlayer(users[0].ID).ChatColor == null)
+							else if (player == null || player.ChatColor == null)
 							{
 								args.Player.SendErrorMessage("This user does not have a chat color to remove.");
 								return;
@@ -659,10 +660,8 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
-				PlayerInfo player = await USFDatabase.GetPlayerAsync(users[0].ID);
 				args.Parameters.RemoveRange(0, 2);
-
-				if (await USFDatabase.RemovePlayerPermissionsAsync(users[0].ID, args.Parameters.Where(p => player.HasPermission(p)).ToList()))
+				if (await USFDatabase.RemovePlayerPermissionsAsync(users[0].ID, args.Parameters))
 				{
 					args.Player.SendSuccessMessage("Modified {0} permissions successfully.", users[0].Name.SuffixPossesion());
 				}
@@ -694,7 +693,7 @@ namespace UserSpecificFunctions
 				TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
 				return;
 			}
-			else if (USFDatabase.GetPlayer(users[0].ID) == null)
+			else if (USFDatabase.GetPlayer(users[0].ID) == null || !USFDatabase.GetPlayer(users[0].ID).Permissions.Any())
 			{
 				args.Player.SendErrorMessage("This player has no permissions to list.");
 				return;

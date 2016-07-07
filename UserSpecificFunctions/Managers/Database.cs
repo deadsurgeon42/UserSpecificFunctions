@@ -9,14 +9,16 @@ using TShockAPI;
 using TShockAPI.DB;
 using Mono.Data.Sqlite;
 using MySql.Data.MySqlClient;
+using UserSpecificFunctions.Extensions;
 
 namespace UserSpecificFunctions
 {
 	public class Database
 	{
 		private static IDbConnection db;
+		public List<PlayerInfo> PlayerData { get; private set; }
 
-		internal static void DBConnect()
+		public void DBConnect()
 		{
 			switch (TShock.Config.StorageType.ToLower())
 			{
@@ -48,21 +50,30 @@ namespace UserSpecificFunctions
 				new SqlColumn("Suffix", MySqlDbType.Text),
 				new SqlColumn("Color", MySqlDbType.Text),
 				new SqlColumn("Permissions", MySqlDbType.Text)));
+
+			Task.Run(() => LoadPlayerData());
+		}
+
+		public async Task LoadPlayerData()
+		{
+			List<PlayerInfo> playerData = await GetPlayersAsync();
+			PlayerData = playerData;
 		}
 
 		public PlayerInfo GetPlayer(int playerID)
 		{
-			using (QueryResult reader = db.QueryReader("SELECT * FROM UserSpecificFunctions WHERE UserID=@0;", playerID.ToString()))
-			{
-				if (reader.Read())
-				{
-					PlayerInfo playerInfo = new PlayerInfo();
-					playerInfo.Load(reader);
-					return playerInfo;
-				}
-			}
+			//using (QueryResult reader = db.QueryReader("SELECT * FROM UserSpecificFunctions WHERE UserID=@0;", playerID.ToString()))
+			//{
+			//	if (reader.Read())
+			//	{
+			//		PlayerInfo playerInfo = new PlayerInfo();
+			//		playerInfo.Load(reader);
+			//		return playerInfo;
+			//	}
+			//}
 
-			return null;
+			//return null;
+			return PlayerData.Find(p => p.UserID == playerID);
 		}
 
 		public Task<PlayerInfo> GetPlayerAsync(int playerID)
@@ -83,19 +94,20 @@ namespace UserSpecificFunctions
 			});
 		}
 
-		public List<PlayerInfo> GetPlayers()
-		{
-			List<PlayerInfo> players = new List<PlayerInfo>();
-			using (QueryResult reader = db.QueryReader("SELECT * FROM UserSpecificFunctions"))
-			{
-				while (reader.Read())
-				{
-					players.Add(GetPlayer(reader.Get<int>("UserID")));
-				}
-			}
+		//public List<PlayerInfo> GetPlayers()
+		//{
+		//	//List<PlayerInfo> players = new List<PlayerInfo>();
+		//	//using (QueryResult reader = db.QueryReader("SELECT * FROM UserSpecificFunctions"))
+		//	//{
+		//	//	while (reader.Read())
+		//	//	{
+		//	//		players.Add(GetPlayer(reader.Get<int>("UserID")));
+		//	//	}
+		//	//}
 
-			return players;
-		}
+		//	//return players;
+		//	return PlayerData;
+		//}
 
 		public Task<List<PlayerInfo>> GetPlayersAsync()
 		{
@@ -114,19 +126,41 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		public Task<bool> AddPlayerAsync(PlayerInfo player)
+		{
+			return Task.Run(() => 
+			{
+				try
+				{
+					PlayerData.Add(player);
+					string query = "INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);";
+					return db.Query(query, player.UserID, player.Prefix, player.Suffix, player.ChatColor, player.Permissions.Any() ? player.Permissions.Separate(",") : null) == 1;
+				}
+				catch(Exception ex)
+				{
+					TShock.Log.Error(ex.ToString());
+					return false;
+				}
+			});
+		}
+
 		public Task<bool> SetPrefixAsync(int playerID, string prefix)
 		{
 			return Task.Run(async () =>
 			{
 				try
 				{
-					if (await GetPlayerAsync(playerID) == null)
+					PlayerInfo player = await GetPlayerAsync(playerID);
+					if (player == null)
 					{
-						db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", playerID.ToString(), prefix, null, null, null);
+						await AddPlayerAsync(new PlayerInfo() { UserID = playerID, Prefix = prefix });
 					}
 					else
 					{
-						db.Query("UPDATE UserSpecificFunctions SET Prefix=@0 WHERE UserID=@1;", prefix, playerID.ToString());
+						player.Prefix = prefix;
+						db.Query("UPDATE UserSpecificFunctions SET Prefix=@0 WHERE UserID=@1;", player.Prefix, player.UserID.ToString());
+						PlayerData.RemoveAll(p => p.UserID == player.UserID);
+						PlayerData.Add(player);
 					}
 
 					return true;
@@ -145,13 +179,17 @@ namespace UserSpecificFunctions
 			{
 				try
 				{
-					if (await GetPlayerAsync(playerID) == null)
+					PlayerInfo player = await GetPlayerAsync(playerID);
+					if (player == null)
 					{
-						db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", playerID.ToString(), null, suffix, null, null);
+						await AddPlayerAsync(new PlayerInfo() { UserID = playerID, Suffix = suffix });
 					}
 					else
 					{
-						db.Query("UPDATE UserSpecificFunctions SET Suffix=@0 WHERE UserID=@1;", suffix, playerID.ToString());
+						player.Suffix = suffix;
+						db.Query("UPDATE UserSpecificFunctions SET Suffix=@0 WHERE UserID=@1;", player.Suffix, player.UserID.ToString());
+						PlayerData.RemoveAll(p => p.UserID == player.UserID);
+						PlayerData.Add(player);
 					}
 
 					return true;
@@ -170,13 +208,17 @@ namespace UserSpecificFunctions
 			{
 				try
 				{
-					if (await GetPlayerAsync(playerID) == null)
+					PlayerInfo player = await GetPlayerAsync(playerID);
+					if (player == null)
 					{
-						db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", playerID.ToString(), null, null, chatColor, null);
+						await AddPlayerAsync(new PlayerInfo() { UserID = playerID, ChatColor = chatColor });
 					}
 					else
 					{
-						db.Query("UPDATE UserSpecificFunctions SET Color=@0 WHERE UserID=@1;", chatColor, playerID.ToString());
+						player.ChatColor = chatColor;
+						db.Query("UPDATE UserSpecificFunctions SET Color=@0 WHERE UserID=@1;", player.ChatColor, player.UserID.ToString());
+						PlayerData.RemoveAll(p => p.UserID == player.UserID);
+						PlayerData.Add(player);
 					}
 
 					return true;
@@ -198,12 +240,14 @@ namespace UserSpecificFunctions
 					PlayerInfo player = await GetPlayerAsync(playerID);
 					if (player == null)
 					{
-						db.Query("INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);", playerID.ToString(), null, null, null, string.Join(",", permissions.ToArray()));
+						await AddPlayerAsync(new PlayerInfo() { UserID = playerID, Permissions = permissions });
 					}
 					else
 					{
-						permissions.ForEach(p => player.Permissions.Add(p));
-						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", string.Join(",", player.Permissions.ToArray()), player.UserID.ToString());
+						permissions.Where(p => player.Permissions.Contains(p)).ForEach(p => player.Permissions.Add(p));
+						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", player.Permissions.Separate(","), player.UserID.ToString());
+						PlayerData.RemoveAll(p => p.UserID == player.UserID);
+						PlayerData.Add(player);
 					}
 
 					return true;
@@ -230,7 +274,9 @@ namespace UserSpecificFunctions
 					else
 					{
 						permissions.ForEach(p => player.Permissions.Remove(p));
-						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", player.Permissions.Count > 0 ? string.Join(",", player.Permissions.ToArray()) : null, player.UserID.ToString());
+						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", player.Permissions.Count > 0 ? player.Permissions.Separate(",") : null, player.UserID.ToString());
+						PlayerData.RemoveAll(p => p.UserID == player.UserID);
+						PlayerData.Add(player);
 					}
 
 					return true;
@@ -256,13 +302,11 @@ namespace UserSpecificFunctions
 
 		public Task<bool> ResetDataAsync(int playerID)
 		{
-			return Task.Run(() =>
+			return Task.Run(async () =>
 			{
 				try
 				{
-					SetPrefixAsync(playerID, null);
-					SetSuffixAsync(playerID, null);
-					SetColorAsync(playerID, null);
+					await Task.WhenAll(SetPrefixAsync(playerID, null), SetSuffixAsync(playerID, null), SetColorAsync(playerID, null));
 					return true;
 				}
 				catch (Exception ex)
@@ -275,17 +319,20 @@ namespace UserSpecificFunctions
 
 		public Task<bool> PurgeEntriesAsync()
 		{
-			return Task.Run(() =>
+			return Task.Run(async () =>
 			{
 				try
 				{
-					foreach (PlayerInfo player in GetPlayers())
+					List<PlayerInfo> pendingRemoval = new List<PlayerInfo>();
+					foreach (PlayerInfo player in PlayerData)
 					{
-						if (player.Prefix == null && player.Suffix == null && player.ChatColor == null && player.Permissions.Count == 0)
+						if (player.Prefix == null && player.Suffix == null && player.ChatColor == null && player.Permissions == null)
 						{
-							RemoveUserAsync(player.UserID);
+							pendingRemoval.Add(player);
+							await RemoveUserAsync(player.UserID);
 						}
 					}
+					PlayerData.RemoveAll(p => pendingRemoval.Contains(p));
 
 					return true;
 				}

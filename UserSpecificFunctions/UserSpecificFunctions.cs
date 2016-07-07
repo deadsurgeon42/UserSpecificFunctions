@@ -18,7 +18,7 @@ namespace UserSpecificFunctions
 		public override string Name { get { return "User Specific Functions"; } }
 		public override string Author { get { return "Professor X"; } }
 		public override string Description { get { return ""; } }
-		public override Version Version { get { return new Version(1, 3, 2, 0); } }
+		public override Version Version { get { return new Version(1, 3, 3, 0); } }
 
 		public static Config USFConfig = new Config();
 		public static Database USFDatabase = new Database();
@@ -56,7 +56,7 @@ namespace UserSpecificFunctions
 		private void OnInitialize(EventArgs args)
 		{
 			LoadConfig();
-			Database.DBConnect();
+			USFDatabase.DBConnect();
 
 			Commands.ChatCommands.RemoveAll(c => c.HasAlias("help"));
 
@@ -142,6 +142,7 @@ namespace UserSpecificFunctions
 		private void OnReload(ReloadEventArgs args)
 		{
 			LoadConfig();
+			Task.Run(() => USFDatabase.LoadPlayerData());
 		}
 		#endregion
 

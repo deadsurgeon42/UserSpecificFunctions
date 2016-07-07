@@ -36,7 +36,7 @@ namespace UserSpecificFunctions
 			Prefix = reader.Get<string>("Prefix");
 			Suffix = reader.Get<string>("Suffix");
 			ChatColor = reader.Get<string>("Color");
-			Permissions = reader.Get<string>("Permissions").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+			Permissions = reader.Get<string>("Permissions")?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 		}
 
 		public PlayerInfo()
@@ -45,7 +45,7 @@ namespace UserSpecificFunctions
 			Prefix = null;
 			Suffix = null;
 			ChatColor = null;
-			Permissions = null;
+			Permissions = new List<string>();
 		}
 	}
 }

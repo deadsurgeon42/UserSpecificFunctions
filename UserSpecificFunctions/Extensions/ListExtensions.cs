@@ -15,5 +15,10 @@ namespace UserSpecificFunctions.Extensions
 
 			return false;
 		}
+
+		public static string Separate<T>(this List<T> list, string separator)
+		{
+			return string.Join(separator, list.ToArray());
+		}
 	}
 }
