@@ -244,7 +244,7 @@ namespace UserSpecificFunctions
 					}
 					else
 					{
-						permissions.Where(p => player.Permissions.Contains(p)).ForEach(p => player.Permissions.Add(p));
+						permissions.Where(p => !player.Permissions.Contains(p)).ForEach(p => player.Permissions.Add(p));
 						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", player.Permissions.Separate(","), player.UserID.ToString());
 						PlayerData.RemoveAll(p => p.UserID == player.UserID);
 						PlayerData.Add(player);
@@ -326,7 +326,7 @@ namespace UserSpecificFunctions
 					List<PlayerInfo> pendingRemoval = new List<PlayerInfo>();
 					foreach (PlayerInfo player in PlayerData)
 					{
-						if (player.Prefix == null && player.Suffix == null && player.ChatColor == null && player.Permissions == null)
+						if (player.Prefix == null && player.Suffix == null && player.ChatColor == null && !player.Permissions.Any())
 						{
 							pendingRemoval.Add(player);
 							await RemoveUserAsync(player.UserID);
