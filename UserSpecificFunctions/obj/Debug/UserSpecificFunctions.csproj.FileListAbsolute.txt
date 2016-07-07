@@ -26,3 +26,5 @@ C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.pdb
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\HttpServer.xml
 C:\Users\sasa\Desktop\USF\UserSpecificFunctions\UserSpecificFunctions\bin\Debug\BCrypt.Net.xml
+C:\Users\sasa\Desktop\tshock_4.3.16\ServerPlugins\UserSpecificFunctions.dll
+C:\Users\sasa\Desktop\tshock_4.3.16\ServerPlugins\UserSpecificFunctions.pdb

@@ -57,10 +57,7 @@ namespace UserSpecificFunctions
 		public async Task LoadPlayerData()
 		{
 			List<PlayerInfo> playerData = await GetPlayersAsync();
-			lock (PlayerData)
-			{
-				PlayerData = playerData;
-			}
+			PlayerData = playerData;
 		}
 
 		public PlayerInfo GetPlayer(int playerID)

@@ -10,10 +10,7 @@ namespace UserSpecificFunctions.Extensions
 	{
 		public static bool Negated(this List<string> permissions, string permission)
 		{
-			if (permission.StartsWith("!") && permissions.Contains(permission))
-				return true;
-
-			return false;
+			return permissions.Any(p => p != null && (p.StartsWith("!") && p.Substring(1) == permission));
 		}
 
 		public static string Separate<T>(this List<T> list, string separator)

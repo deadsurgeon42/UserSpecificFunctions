@@ -18,7 +18,7 @@ namespace UserSpecificFunctions
 		public override string Name { get { return "User Specific Functions"; } }
 		public override string Author { get { return "Professor X"; } }
 		public override string Description { get { return ""; } }
-		public override Version Version { get { return new Version(1, 4, 4, 0); } }
+		public override Version Version { get { return new Version(1, 4, 5, 0); } }
 
 		public static Config USFConfig = new Config();
 		public static Database USFDatabase = new Database();
