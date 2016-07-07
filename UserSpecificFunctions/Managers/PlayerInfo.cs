@@ -27,6 +27,14 @@ namespace UserSpecificFunctions
 			if (Permissions.Contains(permission))
 				return true;
 
+			string[] nodes = permission.Split('.');
+			for (int i = nodes.Length - 1; i >= 0; i--)
+			{
+				nodes[i] = "*";
+				if (Permissions.Contains(string.Join(".", nodes, 0, i + 1)))
+					return true;
+			}
+
 			return false;
 		}
 
