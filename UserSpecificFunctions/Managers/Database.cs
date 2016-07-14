@@ -62,17 +62,6 @@ namespace UserSpecificFunctions
 
 		public PlayerInfo GetPlayer(int playerID)
 		{
-			//using (QueryResult reader = db.QueryReader("SELECT * FROM UserSpecificFunctions WHERE UserID=@0;", playerID.ToString()))
-			//{
-			//	if (reader.Read())
-			//	{
-			//		PlayerInfo playerInfo = new PlayerInfo();
-			//		playerInfo.Load(reader);
-			//		return playerInfo;
-			//	}
-			//}
-
-			//return null;
 			return PlayerData.Find(p => p.UserID == playerID);
 		}
 
@@ -93,21 +82,6 @@ namespace UserSpecificFunctions
 				return null;
 			});
 		}
-
-		//public List<PlayerInfo> GetPlayers()
-		//{
-		//	//List<PlayerInfo> players = new List<PlayerInfo>();
-		//	//using (QueryResult reader = db.QueryReader("SELECT * FROM UserSpecificFunctions"))
-		//	//{
-		//	//	while (reader.Read())
-		//	//	{
-		//	//		players.Add(GetPlayer(reader.Get<int>("UserID")));
-		//	//	}
-		//	//}
-
-		//	//return players;
-		//	return PlayerData;
-		//}
 
 		public Task<List<PlayerInfo>> GetPlayersAsync()
 		{
