@@ -63,7 +63,7 @@ namespace UserSpecificFunctions
 			return true;
 		}
 
-		public static bool ExecuteComamnd(TSPlayer player, string text)
+		public static bool ExecuteCommand(TSPlayer player, string text)
 		{
 			string cmdText = text.Remove(0, 1);
 			string cmdPrefix = text[0].ToString();
