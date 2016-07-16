@@ -102,7 +102,7 @@ namespace UserSpecificFunctions
 				{
 					player.SendErrorMessage("You must use this command in-game.");
 				}
-				else if (!command.CanRun(player) && !player.GetPlayerInfo().HasPermission(command.Permissions[0]))
+				else if ((!command.CanRun(player) && !player.GetPlayerInfo().HasPermission(command.Permissions.Any() ? command.Permissions[0] : null)) || (command.CanRun(player) && player.GetPlayerInfo().Permissions.Negated(command.Permissions.Any() ? command.Permissions[0] : null)))
 				{
 					TShock.Utils.SendLogs(string.Format("{0} tried to execute {1}{2}.", player.Name, TShock.Config.CommandSpecifier, cmdText), Color.PaleVioletRed, player);
 					player.SendErrorMessage("You do not have access to this command.");
