@@ -29,8 +29,8 @@ namespace UserSpecificFunctions
 				}
 
 				IEnumerable<string> cmdNames = from cmd in Commands.ChatCommands
-											   where (cmd.CanRun(args.Player) && !args.Player.GetPlayerInfo().Permissions.Negated(cmd.Permissions.Any() ? cmd.Permissions[0] : null))
-											   || (args.Player.GetPlayerInfo().HasPermission(cmd.Permissions.Any() ? cmd.Permissions[0] : null) && (cmd.Name != "auth" || TShock.AuthToken != 0))
+											   where (cmd.CanRun(args.Player) && args.Player.GetPlayerInfo() != null && !args.Player.GetPlayerInfo().Permissions.Negated(cmd.Permissions.Any() ? cmd.Permissions[0] : null))
+											   || (args.Player.GetPlayerInfo() != null && args.Player.GetPlayerInfo().HasPermission(cmd.Permissions.Any() ? cmd.Permissions[0] : null) && (cmd.Name != "auth" || TShock.AuthToken != 0))
 											   orderby cmd.Name
 											   select TShock.Config.CommandSpecifier + cmd.Name;
 
