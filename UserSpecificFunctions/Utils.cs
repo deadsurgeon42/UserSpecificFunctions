@@ -18,11 +18,11 @@ namespace UserSpecificFunctions
 		{
 			List<User> users = new List<User>();
 
-			foreach (User user in TShock.Users.GetUsers())
+			foreach (User user in TShock.Users.GetUsersByName(userName))
 			{
 				if (user != null)
 				{
-					if (user.Name.Equals(userName))
+					if (user.Name == userName)
 						return new List<User> { user };
 					else if (user.Name.ToLower().StartsWith(userName.ToLower()))
 						users.Add(user);
