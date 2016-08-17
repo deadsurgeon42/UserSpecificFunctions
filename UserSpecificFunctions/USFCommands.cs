@@ -386,7 +386,7 @@ namespace UserSpecificFunctions
 				TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
 				return;
 			}
-			else if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.setOther))
+			else if (users[0].Name != args.Player.User.Name && !args.Player.HasPermission(Permissions.setOther))
 			{
 				args.Player.SendErrorMessage("You can't modify this player's data.");
 				return;
@@ -579,7 +579,7 @@ namespace UserSpecificFunctions
 				args.Player.SendErrorMessage("This user has no custom data to read.");
 				return;
 			}
-			else if (users[0].Name != args.Player.User.Name && !args.Player.Group.HasPermission(Permissions.readOther))
+			else if (users[0].Name != args.Player.User.Name && !args.Player.HasPermission(Permissions.readOther))
 			{
 				args.Player.SendErrorMessage("You can't read this player's data.");
 				return;
