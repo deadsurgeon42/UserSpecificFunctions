@@ -128,9 +128,12 @@ namespace UserSpecificFunctions
 			{
 				try
 				{
-					PlayerData.Add(player);
-					string query = "INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);";
-					return db.Query(query, player.UserID, player.Prefix, player.Suffix, player.ChatColor, player.Permissions.Any() ? player.Permissions.Separate(",") : null) == 1;
+					lock (PlayerData)
+					{
+						PlayerData.Add(player);
+						string query = "INSERT INTO UserSpecificFunctions (UserID, Prefix, Suffix, Color, Permissions) VALUES (@0, @1, @2, @3, @4);";
+						return db.Query(query, player.UserID, player.Prefix, player.Suffix, player.ChatColor, player.Permissions.Any() ? player.Permissions.Separate(",") : null) == 1;
+					}
 				}
 				catch(Exception ex)
 				{
@@ -161,8 +164,11 @@ namespace UserSpecificFunctions
 					{
 						player.Prefix = prefix;
 						db.Query("UPDATE UserSpecificFunctions SET Prefix=@0 WHERE UserID=@1;", player.Prefix, player.UserID.ToString());
-						PlayerData.RemoveAll(p => p.UserID == player.UserID);
-						PlayerData.Add(player);
+						lock (PlayerData)
+						{
+							PlayerData.RemoveAll(p => p.UserID == player.UserID);
+							PlayerData.Add(player);
+						}
 					}
 
 					return true;
@@ -196,8 +202,11 @@ namespace UserSpecificFunctions
 					{
 						player.Suffix = suffix;
 						db.Query("UPDATE UserSpecificFunctions SET Suffix=@0 WHERE UserID=@1;", player.Suffix, player.UserID.ToString());
-						PlayerData.RemoveAll(p => p.UserID == player.UserID);
-						PlayerData.Add(player);
+						lock (PlayerData)
+						{
+							PlayerData.RemoveAll(p => p.UserID == player.UserID);
+							PlayerData.Add(player);
+						}
 					}
 
 					return true;
@@ -231,8 +240,11 @@ namespace UserSpecificFunctions
 					{
 						player.ChatColor = chatColor;
 						db.Query("UPDATE UserSpecificFunctions SET Color=@0 WHERE UserID=@1;", player.ChatColor, player.UserID.ToString());
-						PlayerData.RemoveAll(p => p.UserID == player.UserID);
-						PlayerData.Add(player);
+						lock (PlayerData)
+						{
+							PlayerData.RemoveAll(p => p.UserID == player.UserID);
+							PlayerData.Add(player);
+						}
 					}
 
 					return true;
@@ -266,8 +278,11 @@ namespace UserSpecificFunctions
 					{
 						permissions.Where(p => !player.Permissions.Contains(p)).ForEach(p => player.Permissions.Add(p));
 						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", player.Permissions.Separate(","), player.UserID.ToString());
-						PlayerData.RemoveAll(p => p.UserID == player.UserID);
-						PlayerData.Add(player);
+						lock (PlayerData)
+						{
+							PlayerData.RemoveAll(p => p.UserID == player.UserID);
+							PlayerData.Add(player);
+						}
 					}
 
 					return true;
@@ -301,8 +316,11 @@ namespace UserSpecificFunctions
 					{
 						permissions.ForEach(p => player.Permissions.Remove(p));
 						db.Query("UPDATE UserSpecificFunctions SET Permissions=@0 WHERE UserID=@1;", player.Permissions.Count > 0 ? player.Permissions.Separate(",") : null, player.UserID.ToString());
-						PlayerData.RemoveAll(p => p.UserID == player.UserID);
-						PlayerData.Add(player);
+						lock (PlayerData)
+						{
+							PlayerData.RemoveAll(p => p.UserID == player.UserID);
+							PlayerData.Add(player);
+						}
 					}
 
 					return true;
@@ -324,7 +342,6 @@ namespace UserSpecificFunctions
 		{
 			return Task.Run(() =>
 			{
-				PlayerData.Remove(GetPlayer(playerID));
 				return db.Query("DELETE FROM UserSpecificFunctions WHERE UserID=@0;", playerID.ToString()) == 1;
 			});
 		}
@@ -370,7 +387,11 @@ namespace UserSpecificFunctions
 							await RemoveUserAsync(player.UserID);
 						}
 					}
-					PlayerData.RemoveAll(p => pendingRemoval.Contains(p));
+
+					lock (PlayerData)
+					{
+						PlayerData.RemoveAll(p => pendingRemoval.Contains(p));
+					}
 
 					return true;
 				}
