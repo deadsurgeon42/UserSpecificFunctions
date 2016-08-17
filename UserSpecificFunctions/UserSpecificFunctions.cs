@@ -18,14 +18,15 @@ namespace UserSpecificFunctions
 		public override string Name { get { return "User Specific Functions"; } }
 		public override string Author { get { return "Professor X"; } }
 		public override string Description { get { return ""; } }
-		public override Version Version { get { return new Version(1, 4, 6, 0); } }
+		public override Version Version { get { return new Version(1, 4, 7, 0); } }
 
-		public static Config USFConfig = new Config();
-		public static Database USFDatabase = new Database();
+		public Config USFConfig = new Config();
+		public Database USFDatabase = new Database();
 
+		public static UserSpecificFunctions Instance;
 		public UserSpecificFunctions(Main game) : base(game)
 		{
-
+			Instance = this;
 		}
 
 		#region Initialize/Dispose
@@ -53,6 +54,10 @@ namespace UserSpecificFunctions
 		#endregion
 
 		#region Hooks
+		/// <summary>
+		/// Internal hook, fired when the server is set up.
+		/// </summary>
+		/// <param name="args">The <see cref="EventArgs"/> object.</param>
 		private void OnInitialize(EventArgs args)
 		{
 			LoadConfig();
@@ -65,17 +70,30 @@ namespace UserSpecificFunctions
 			Commands.ChatCommands.Add(new Command(Permissions.setPermissions, USFCommands.USFPermission, "permission"));
 		}
 
+		/// <summary>
+		/// Internal hook, fired when a chat message is sent.
+		/// </summary>
+		/// <param name="args">The <see cref="ServerChatEventArgs"/> object.</param>
 		private void OnChat(ServerChatEventArgs args)
 		{
+			// Return if the packet was already handled by another plugin.
 			if (args.Handled)
+			{
 				return;
+			}
 
+			// Ensure the player is not null and has modified data.
 			TSPlayer tsplr = TShock.Players[args.Who];
 			if (tsplr == null || tsplr.GetPlayerInfo() == null)
+			{
 				return;
+			}
 
+			// Check if the player has the permission to speak and has not been muted.
 			if (!tsplr.HasPermission(TShockAPI.Permissions.canchat) || tsplr.mute)
+			{
 				return;
+			}
 
 			if (!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier))
 			{
@@ -113,6 +131,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
+				// Check if the player entered a command.
 				if (!string.IsNullOrWhiteSpace(args.Text.Substring(1)))
 				{
 					try
@@ -128,17 +147,32 @@ namespace UserSpecificFunctions
 			}
 		}
 
+		/// <summary>
+		/// Internal hook, fired whenever <see cref="TSPlayer.HasPermission(string)"/> is invoked.
+		/// </summary>
+		/// <param name="args">The <see cref="PlayerPermissionEventArgs"/> object.</param>
 		private void OnPlayerPermission(PlayerPermissionEventArgs args)
 		{
+			// Return if the event was already handled by another plugin.
 			if (args.Handled)
+			{
 				return;
+			}
 
+			// Ensure the player is not null and has special permissions.
 			if (args.Player == null || args.Player.GetPlayerInfo() == null)
+			{
 				return;
+			}
 
+			// Handle the event.
 			args.Handled = args.Player.GetPlayerInfo().HasPermission(args.Permission);
 		}
 
+		/// <summary>
+		/// Internal hook, fired whenever a player executes /reload.
+		/// </summary>
+		/// <param name="args">The <see cref="ReloadEventArgs"/> object.</param>
 		private void OnReload(ReloadEventArgs args)
 		{
 			LoadConfig();
@@ -147,10 +181,13 @@ namespace UserSpecificFunctions
 		#endregion
 
 		#region LoadConfig
-		internal static void LoadConfig()
+		/// <summary>
+		/// Internal method, reloads the configuration file.
+		/// </summary>
+		internal void LoadConfig()
 		{
 			string configPath = Path.Combine(TShock.SavePath, "UserSpecificFunctions.json");
-			USFConfig = Config.Read(configPath);
+			USFConfig = Config.TryRead(configPath);
 		}
 		#endregion
 	}

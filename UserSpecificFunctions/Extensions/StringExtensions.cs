@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace UserSpecificFunctions.Extensions
 {
+	/// <summary>
+	/// Provides extension methods for <see cref="string"/>s.
+	/// </summary>
     public static class StringExtensions
     {
         public static string SuffixPossesion(this string source)
@@ -13,6 +16,11 @@ namespace UserSpecificFunctions.Extensions
             return source + (source.EndsWith("s") ? "'" : "'s");
         }
 
+		/// <summary>
+		/// Attempts to convert a string to a Color.
+		/// </summary>
+		/// <param name="source">The string to convert.</param>
+		/// <returns>A <see cref="Color"/> object.</returns>
         public static Color ToColor(this string source)
         {
             string[] color = source.Split(',');

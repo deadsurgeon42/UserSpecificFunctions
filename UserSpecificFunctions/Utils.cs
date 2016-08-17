@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TShockAPI;
 using TShockAPI.DB;
@@ -14,6 +13,11 @@ namespace UserSpecificFunctions
 	public static class Utils
 	{
 		#region Miscellaneous
+		/// <summary>
+		/// Returns a list of <see cref="User"/>s matching the name.
+		/// </summary>
+		/// <param name="userName">The name to match with.</param>
+		/// <returns>A list of <see cref="User"/>s.</returns>
 		public static List<User> GetUsersByName(string userName)
 		{
 			List<User> users = new List<User>();
@@ -31,22 +35,17 @@ namespace UserSpecificFunctions
 
 			return users;
 		}
-
-		public static async Task<List<string>> ListCommands(int playerID)
-		{
-			PlayerInfo player = await USFDatabase.GetPlayerAsync(playerID);
-			List<string> permissions = new List<string>();
-			foreach (string permission in player.Permissions)
-			{
-				Command command = Commands.ChatCommands.Find(c => c.Permissions.Contains(permission));
-				permissions.Add(permission + " ({0}{1})".SFormat(command == null ? "" : TShock.Config.CommandSpecifier, command?.Name ?? "Not a command."));
-			}
-
-			return permissions;
-		}
 		#endregion
 
 		#region Command Related
+		/// <summary>
+		/// Invokes a command delegate.
+		/// </summary>
+		/// <param name="command">The command.</param>
+		/// <param name="msg">The command text.</param>
+		/// <param name="tsPlayer">The command issuer.</param>
+		/// <param name="args">The parsed text.</param>
+		/// <returns>True or false.</returns>
 		public static bool RunCommand(Command command, string msg, TSPlayer tsPlayer, List<string> args)
 		{
 			try
@@ -63,6 +62,12 @@ namespace UserSpecificFunctions
 			return true;
 		}
 
+		/// <summary>
+		/// Executes a command. Checks for specific permissions.
+		/// </summary>
+		/// <param name="player">The command issuer.</param>
+		/// <param name="text">The command text.</param>
+		/// <returns>True or false.</returns>
 		public static bool ExecuteCommand(TSPlayer player, string text)
 		{
 			string cmdText = text.Remove(0, 1);

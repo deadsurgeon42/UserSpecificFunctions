@@ -205,7 +205,7 @@ namespace UserSpecificFunctions
 				args.Parameters.RemoveRange(0, 2);
 				string prefix = string.Join(" ", args.Parameters.Select(p => p));
 
-				foreach (string word in USFConfig.UnAllowedWords)
+				foreach (string word in Instance.USFConfig.UnAllowedWords)
 				{
 					if (prefix.ToLower().Contains(word.ToLower()))
 					{
@@ -214,14 +214,14 @@ namespace UserSpecificFunctions
 					}
 				}
 
-				if (prefix.Length > USFConfig.PrefixLength)
+				if (prefix.Length > Instance.USFConfig.PrefixLength)
 				{
-					args.Player.SendErrorMessage("Your prefix cannot be longer than {0} characters.", USFConfig.PrefixLength);
+					args.Player.SendErrorMessage("Your prefix cannot be longer than {0} characters.", Instance.USFConfig.PrefixLength);
 					return;
 				}
 				else
 				{
-					if (await USFDatabase.SetPrefixAsync(users[0].ID, prefix))
+					if (await Instance.USFDatabase.SetPrefixAsync(users[0].ID, prefix))
 					{
 						args.Player.SendSuccessMessage("Set {0} prefix to: '{1}'", users[0].Name.SuffixPossesion(), prefix);
 					}
@@ -276,7 +276,7 @@ namespace UserSpecificFunctions
 				args.Parameters.RemoveRange(0, 2);
 				string suffix = string.Join(" ", args.Parameters.Select(p => p));
 
-				foreach (string word in USFConfig.UnAllowedWords)
+				foreach (string word in Instance.USFConfig.UnAllowedWords)
 				{
 					if (suffix.ToLower().Contains(word.ToLower()))
 					{
@@ -285,14 +285,14 @@ namespace UserSpecificFunctions
 					}
 				}
 
-				if (suffix.Length > USFConfig.PrefixLength)
+				if (suffix.Length > Instance.USFConfig.PrefixLength)
 				{
-					args.Player.SendErrorMessage("Your prefix cannot be longer than {0} characters.", USFConfig.SuffixLength);
+					args.Player.SendErrorMessage("Your prefix cannot be longer than {0} characters.", Instance.USFConfig.SuffixLength);
 					return;
 				}
 				else
 				{
-					if (await USFDatabase.SetSuffixAsync(users[0].ID, suffix))
+					if (await Instance.USFDatabase.SetSuffixAsync(users[0].ID, suffix))
 					{
 						args.Player.SendSuccessMessage("Set {0} suffix to: '{1}'", users[0].Name.SuffixPossesion(), suffix);
 					}
@@ -348,7 +348,7 @@ namespace UserSpecificFunctions
 				string[] color = args.Parameters[2].Split(',');
 				if (color.Length == 3 && byte.TryParse(color[0], out r) && byte.TryParse(color[1], out g) && byte.TryParse(color[2], out b))
 				{
-					if (await USFDatabase.SetColorAsync(users[0].ID, args.Parameters[2]))
+					if (await Instance.USFDatabase.SetColorAsync(users[0].ID, args.Parameters[2]))
 					{
 						args.Player.SendSuccessMessage("Set {0} chat color to: '{1}'", users[0].Name.SuffixPossesion(), args.Parameters[2]);
 					}
@@ -396,7 +396,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
-				PlayerInfo player = await USFDatabase.GetPlayerAsync(users[0].ID);
+				PlayerInfo player = await Instance.USFDatabase.GetPlayerAsync(users[0].ID);
 				switch (args.Parameters[2].ToLower())
 				{
 					case "prefix":
@@ -413,7 +413,7 @@ namespace UserSpecificFunctions
 							}
 							else
 							{
-								if (await USFDatabase.SetPrefixAsync(users[0].ID, null))
+								if (await Instance.USFDatabase.SetPrefixAsync(users[0].ID, null))
 								{
 									args.Player.SendSuccessMessage("Removed {0} prefix.", users[0].Name.SuffixPossesion());
 								}
@@ -438,7 +438,7 @@ namespace UserSpecificFunctions
 							}
 							else
 							{
-								if (await USFDatabase.SetSuffixAsync(users[0].ID, null))
+								if (await Instance.USFDatabase.SetSuffixAsync(users[0].ID, null))
 								{
 									args.Player.SendSuccessMessage("Removed {0} suffix.", users[0].Name.SuffixPossesion());
 								}
@@ -463,7 +463,7 @@ namespace UserSpecificFunctions
 							}
 							else
 							{
-								if (await USFDatabase.SetColorAsync(users[0].ID, null))
+								if (await Instance.USFDatabase.SetColorAsync(users[0].ID, null))
 								{
 									args.Player.SendSuccessMessage("Removed {0} color.", users[0].Name.SuffixPossesion());
 								}
@@ -511,7 +511,7 @@ namespace UserSpecificFunctions
 				TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
 				return;
 			}
-			else if (USFDatabase.GetPlayer(users[0].ID) == null)
+			else if (Instance.USFDatabase.GetPlayer(users[0].ID) == null)
 			{
 				args.Player.SendErrorMessage("This player has no custom data to rest.");
 				return;
@@ -523,7 +523,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
-				if (await USFDatabase.ResetDataAsync(users[0].ID))
+				if (await Instance.USFDatabase.ResetDataAsync(users[0].ID))
 				{
 					args.Player.SendSuccessMessage("Reset {0} data successfully.", users[0].Name.SuffixPossesion());
 				}
@@ -545,7 +545,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
-				if (await USFDatabase.PurgeEntriesAsync())
+				if (await Instance.USFDatabase.PurgeEntriesAsync())
 				{
 					args.Player.SendSuccessMessage("Invalid entries purged.");
 				}
@@ -577,7 +577,7 @@ namespace UserSpecificFunctions
 				TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
 				return;
 			}
-			else if (USFDatabase.GetPlayer(users[0].ID) == null)
+			else if (Instance.USFDatabase.GetPlayer(users[0].ID) == null)
 			{
 				args.Player.SendErrorMessage("This user has no custom data to read.");
 				return;
@@ -589,7 +589,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
-				PlayerInfo player = await USFDatabase.GetPlayerAsync(users[0].ID);
+				PlayerInfo player = await Instance.USFDatabase.GetPlayerAsync(users[0].ID);
 				args.Player.SendMessage($"Username: {users[0].Name}", Color.LawnGreen);
 				args.Player.SendMessage($"Prefix: {player.Prefix?.ToString() ?? "None"}", Color.LawnGreen);
 				args.Player.SendMessage($"Suffix: {player.Suffix?.ToString() ?? "None"}", Color.LawnGreen);
@@ -621,7 +621,7 @@ namespace UserSpecificFunctions
 			else
 			{
 				args.Parameters.RemoveRange(0, 2);
-				if (await USFDatabase.AddPlayerPermissionsAsync(users[0].ID, args.Parameters))
+				if (await Instance.USFDatabase.AddPlayerPermissionsAsync(users[0].ID, args.Parameters))
 				{
 					args.Player.SendSuccessMessage("Modified {0} permissions successfully.", users[0].Name.SuffixPossesion());
 				}
@@ -653,7 +653,7 @@ namespace UserSpecificFunctions
 				TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
 				return;
 			}
-			else if (USFDatabase.GetPlayer(users[0].ID) == null)
+			else if (Instance.USFDatabase.GetPlayer(users[0].ID) == null)
 			{
 				args.Player.SendErrorMessage("This user has no permissions to remove.");
 				return;
@@ -661,7 +661,7 @@ namespace UserSpecificFunctions
 			else
 			{
 				args.Parameters.RemoveRange(0, 2);
-				if (await USFDatabase.RemovePlayerPermissionsAsync(users[0].ID, args.Parameters))
+				if (await Instance.USFDatabase.RemovePlayerPermissionsAsync(users[0].ID, args.Parameters))
 				{
 					args.Player.SendSuccessMessage("Modified {0} permissions successfully.", users[0].Name.SuffixPossesion());
 				}
@@ -674,7 +674,7 @@ namespace UserSpecificFunctions
 		#endregion
 
 		#region ListPermissions
-		private static async void ListPlayerPermissions(CommandArgs args)
+		private static void ListPlayerPermissions(CommandArgs args)
 		{
 			if (args.Parameters.Count < 2 || args.Parameters.Count > 3)
 			{
@@ -693,7 +693,7 @@ namespace UserSpecificFunctions
 				TShock.Utils.SendMultipleMatchError(args.Player, users.Select(p => p.Name));
 				return;
 			}
-			else if (USFDatabase.GetPlayer(users[0].ID) == null || !USFDatabase.GetPlayer(users[0].ID).Permissions.Any())
+			else if (Instance.USFDatabase.GetPlayer(users[0].ID) == null || !Instance.USFDatabase.GetPlayer(users[0].ID).Permissions.Any())
 			{
 				args.Player.SendErrorMessage("This player has no permissions to list.");
 				return;
@@ -704,7 +704,7 @@ namespace UserSpecificFunctions
 				if (!PaginationTools.TryParsePageNumber(args.Parameters, 2, args.Player, out pageNum))
 					return;
 
-				List<string> permissionList = await Utils.ListCommands(users[0].ID);
+				List<string> permissionList = Instance.USFDatabase.GetPlayer(users[0].ID).Permissions;
 				PaginationTools.SendPage(args.Player, pageNum, PaginationTools.BuildLinesFromTerms(permissionList), new PaginationTools.Settings
 				{
 					HeaderFormat = "{0} permissions:".SFormat(users[0].Name.SuffixPossesion()),

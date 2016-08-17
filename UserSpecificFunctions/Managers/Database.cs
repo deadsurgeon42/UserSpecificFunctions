@@ -54,17 +54,31 @@ namespace UserSpecificFunctions
 			Task.Run(() => LoadPlayerData());
 		}
 
+		/// <summary>
+		/// Reloads player data into memory.
+		/// </summary>
+		/// <returns></returns>
 		public async Task LoadPlayerData()
 		{
 			List<PlayerInfo> playerData = await GetPlayersAsync();
 			PlayerData = playerData;
 		}
 
+		/// <summary>
+		/// Gets the player matching the specified ID.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <returns>A <see cref="PlayerInfo"/> object.</returns>
 		public PlayerInfo GetPlayer(int playerID)
 		{
 			return PlayerData.Find(p => p.UserID == playerID);
 		}
 
+		/// <summary>
+		/// Gets the player matching the specified ID as an asynchronous operation.
+		/// </summary>
+		/// <param name="playerID"></param>
+		/// <returns></returns>
 		public Task<PlayerInfo> GetPlayerAsync(int playerID)
 		{
 			return Task.Run(() =>
@@ -83,6 +97,10 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Pulls players from the database as an asynchronous operation.
+		/// </summary>
+		/// <returns></returns>
 		public Task<List<PlayerInfo>> GetPlayersAsync()
 		{
 			List<PlayerInfo> players = new List<PlayerInfo>();
@@ -100,6 +118,11 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously inserts a player into the database.
+		/// </summary>
+		/// <param name="player"></param>
+		/// <returns></returns>
 		public Task<bool> AddPlayerAsync(PlayerInfo player)
 		{
 			return Task.Run(() => 
@@ -118,6 +141,12 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously sets the player's prefix.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <param name="prefix">The player's prefix.</param>
+		/// <returns>A task with the return type of true or false.</returns>
 		public Task<bool> SetPrefixAsync(int playerID, string prefix)
 		{
 			return Task.Run(async () =>
@@ -147,6 +176,12 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously sets the player's prefix.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <param name="suffix">The player's suffix.</param>
+		/// <returns>A task with the return type of true or false.</returns>
 		public Task<bool> SetSuffixAsync(int playerID, string suffix)
 		{
 			return Task.Run(async () =>
@@ -176,6 +211,12 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously sets the player's color.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <param name="color">The player's color.</param>
+		/// <returns>A task with the return type of true or false.</returns>
 		public Task<bool> SetColorAsync(int playerID, string chatColor)
 		{
 			return Task.Run(async () =>
@@ -205,6 +246,12 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously adds permissions to the player.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <param name="permissions">The list of permissions.</param>
+		/// <returns>A task with the return type of true or false.</returns>
 		public Task<bool> AddPlayerPermissionsAsync(int playerID, List<string> permissions)
 		{
 			return Task.Run(async () =>
@@ -234,6 +281,12 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously removes permissions from the player.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <param name="permissions">The list of permissions.</param>
+		/// <returns>A task with the return type of true or false.</returns>
 		public Task<bool> RemovePlayerPermissionsAsync(int playerID, List<string> permissions)
 		{
 			return Task.Run(async () =>
@@ -263,17 +316,25 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously removes the player from the database.
+		/// </summary>
+		/// <param name="playerID">The player's ID.</param>
+		/// <returns>A task with the return type of true or false.</returns>
 		public Task<bool> RemoveUserAsync(int playerID)
 		{
 			return Task.Run(() =>
 			{
-				if (db.Query("DELETE FROM UserSpecificFunctions WHERE UserID=@0;", playerID.ToString()) == 1)
-					return true;
-				else
-					return false;
+				PlayerData.Remove(GetPlayer(playerID));
+				return db.Query("DELETE FROM UserSpecificFunctions WHERE UserID=@0;", playerID.ToString()) == 1;
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously resets the player's information.
+		/// </summary>
+		/// <param name="playerID"></param>
+		/// <returns></returns>
 		public Task<bool> ResetDataAsync(int playerID)
 		{
 			return Task.Run(async () =>
@@ -291,6 +352,10 @@ namespace UserSpecificFunctions
 			});
 		}
 
+		/// <summary>
+		/// Asynchronously removes empty entries from the database.
+		/// </summary>
+		/// <returns></returns>
 		public Task<bool> PurgeEntriesAsync()
 		{
 			return Task.Run(async () =>
