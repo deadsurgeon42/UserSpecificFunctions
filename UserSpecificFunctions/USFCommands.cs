@@ -323,7 +323,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = TShock.Users.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -393,7 +393,7 @@ namespace UserSpecificFunctions
 			}
 			else
 			{
-				PlayerInfo player = await Instance.USFDatabase.GetPlayerAsync(users[0].ID);
+				PlayerInfo player = Instance.USFDatabase.GetPlayer(users[0].ID);
 				switch (args.Parameters[2].ToLower())
 				{
 					case "prefix":
@@ -604,7 +604,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = TShock.Users.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -639,7 +639,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = TShock.Users.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
