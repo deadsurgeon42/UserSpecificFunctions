@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TShockAPI;
 using TShockAPI.DB;
 using UserSpecificFunctions.Extensions;
@@ -184,7 +181,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = Utils.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -255,7 +252,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = Utils.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -378,7 +375,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = Utils.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -500,7 +497,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = Utils.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -566,7 +563,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = Utils.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");
@@ -682,7 +679,7 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			List<User> users = Utils.GetUsersByName(args.Parameters[1]);
+			List<User> users = TShock.Users.GetUsersByNameEx(args.Parameters[1]);
 			if (users.Count == 0)
 			{
 				args.Player.SendErrorMessage("Invalid player!");

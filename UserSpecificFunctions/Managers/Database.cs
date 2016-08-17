@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Data;
@@ -78,7 +77,7 @@ namespace UserSpecificFunctions
 		/// Gets the player matching the specified ID as an asynchronous operation.
 		/// </summary>
 		/// <param name="playerID"></param>
-		/// <returns></returns>
+		/// <returns>A task with the return type of list of <see cref="PlayerInfo"/> objects.</returns>
 		public Task<PlayerInfo> GetPlayerAsync(int playerID)
 		{
 			return Task.Run(() =>
@@ -100,7 +99,7 @@ namespace UserSpecificFunctions
 		/// <summary>
 		/// Pulls players from the database as an asynchronous operation.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>A task with the return type of list of <see cref="PlayerInfo"/> objects.</returns>
 		public Task<List<PlayerInfo>> GetPlayersAsync()
 		{
 			List<PlayerInfo> players = new List<PlayerInfo>();

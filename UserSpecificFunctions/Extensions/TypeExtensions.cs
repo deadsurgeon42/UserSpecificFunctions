@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
 
 namespace UserSpecificFunctions.Extensions
 {
+	/// <summary>
+	/// Provides extension methods for Types.
+	/// </summary>
     public static class TypeExtensions
     {
 		/// <summary>

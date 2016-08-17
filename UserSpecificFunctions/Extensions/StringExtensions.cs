@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace UserSpecificFunctions.Extensions
 {
 	/// <summary>
-	/// Provides extension methods for <see cref="string"/>s.
+	/// Provides extension methods for the <see cref="string"/> class.
 	/// </summary>
     public static class StringExtensions
     {

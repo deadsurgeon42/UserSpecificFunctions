@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace UserSpecificFunctions.Extensions
 {
 	/// <summary>
-	/// Provides extension methods for <see cref="List{T}"/>
+	/// Provides extension methods for the <see cref="List{T}"/> class.
 	/// </summary>
 	public static class ListExtensions
 	{

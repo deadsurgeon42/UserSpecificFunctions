@@ -136,7 +136,7 @@ namespace UserSpecificFunctions
 				{
 					try
 					{
-						args.Handled = Utils.ExecuteCommand(tsplr, args.Text);
+						args.Handled = tsplr.ExecuteCommand(args.Text);
 					}
 					catch (Exception ex)
 					{
