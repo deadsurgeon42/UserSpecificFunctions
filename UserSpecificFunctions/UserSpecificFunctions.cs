@@ -6,6 +6,7 @@ using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.Hooks;
 using UserSpecificFunctions.Extensions;
+using DiscordBridge.Chat;
 
 namespace UserSpecificFunctions
 {
@@ -30,8 +31,8 @@ namespace UserSpecificFunctions
 		public override void Initialize()
 		{
 			ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
-			ServerApi.Hooks.ServerChat.Register(this, OnChat);
 
+			DiscordBridge.DiscordBridge.Instance.ChatHandler.PlayerChatting += OnChat;
 			PlayerHooks.PlayerPermission += OnPlayerPermission;
 			GeneralHooks.ReloadEvent += OnReload;
 		}
@@ -41,8 +42,8 @@ namespace UserSpecificFunctions
 			if (disposing)
 			{
 				ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
-				ServerApi.Hooks.ServerChat.Deregister(this, OnChat);
 
+				DiscordBridge.DiscordBridge.Instance.ChatHandler.PlayerChatting -= OnChat;
 				PlayerHooks.PlayerPermission -= OnPlayerPermission;
 				GeneralHooks.ReloadEvent -= OnReload;
 			}
@@ -70,78 +71,19 @@ namespace UserSpecificFunctions
 		/// <summary>
 		/// Internal hook, fired when a chat message is sent.
 		/// </summary>
-		/// <param name="args">The <see cref="ServerChatEventArgs"/> object.</param>
-		private void OnChat(ServerChatEventArgs args)
+		/// <param name="sender">The object that fired the event.</param>
+		/// <param name="args">The event args.</param>
+		private void OnChat(object sender, PlayerChattingEventArgs args)
 		{
-			// Return if the packet was already handled by another plugin.
-			if (args.Handled)
+			// Ensure the player has modified data.
+			if (args.Player.GetPlayerInfo() == null)
 			{
 				return;
 			}
 
-			// Ensure the player is not null and has modified data.
-			TSPlayer tsplr = TShock.Players[args.Who];
-			if (tsplr == null || tsplr.GetPlayerInfo() == null)
-			{
-				return;
-			}
-
-			// Check if the player has the permission to speak and has not been muted.
-			if (!tsplr.HasPermission(TShockAPI.Permissions.canchat) || tsplr.mute)
-			{
-				return;
-			}
-
-			if (!args.Text.StartsWith(TShock.Config.CommandSpecifier) && !args.Text.StartsWith(TShock.Config.CommandSilentSpecifier))
-			{
-				string prefix = tsplr.GetPlayerInfo().Prefix?.ToString() ?? tsplr.Group.Prefix;
-				string suffix = tsplr.GetPlayerInfo().Suffix?.ToString() ?? tsplr.Group.Suffix;
-				Color chatColor = tsplr.GetPlayerInfo().ChatColor?.ToColor() ?? tsplr.Group.ChatColor.ToColor();
-
-				if (!TShock.Config.EnableChatAboveHeads)
-				{
-					string message = string.Format(TShock.Config.ChatFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix, args.Text);
-					TSPlayer.All.SendMessage(message, chatColor);
-					TSPlayer.Server.SendMessage(message, chatColor);
-					TShock.Log.Info("Broadcast: {0}", message);
-
-					args.Handled = true;
-				}
-				else
-				{
-					Player player = Main.player[args.Who];
-					string name = player.name;
-					player.name = string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix);
-					NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, player.name, args.Who, 0, 0, 0, 0);
-					player.name = name;
-					var text = args.Text;
-					NetMessage.SendData((int)PacketTypes.ChatText, -1, args.Who, text, args.Who, chatColor.R, chatColor.G, chatColor.B);
-					NetMessage.SendData((int)PacketTypes.PlayerInfo, -1, -1, name, args.Who, 0, 0, 0, 0);
-
-					string message = string.Format("<{0}> {1}", string.Format(TShock.Config.ChatAboveHeadsFormat, tsplr.Group.Name, prefix, tsplr.Name, suffix), text);
-					tsplr.SendMessage(message, chatColor);
-					TSPlayer.Server.SendMessage(message, chatColor);
-					TShock.Log.Info("Broadcast: {0}", message);
-
-					args.Handled = true;
-				}
-			}
-			else
-			{
-				// Check if the player entered a command.
-				if (!string.IsNullOrWhiteSpace(args.Text.Substring(1)))
-				{
-					try
-					{
-						args.Handled = tsplr.ExecuteCommand(args.Text);
-					}
-					catch (Exception ex)
-					{
-						TShock.Log.ConsoleError("An exception occured executing a command.");
-						TShock.Log.Error(ex.ToString());
-					}
-				}
-			}
+			args.Message.Prefix(args.Player.GetPlayerInfo().Prefix)
+						.Suffix(args.Player.GetPlayerInfo().Suffix)
+						.Colorize(args.Player.GetPlayerInfo().ChatColor?.ToColor());
 		}
 
 		/// <summary>
