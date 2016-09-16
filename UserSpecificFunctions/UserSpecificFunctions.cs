@@ -32,7 +32,7 @@ namespace UserSpecificFunctions
 		{
 			ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
 
-			DiscordBridge.DiscordBridge.Instance.ChatHandler.PlayerChatting += OnChat;
+			ChatHandler.PlayerChatting += OnChat;
 			PlayerHooks.PlayerPermission += OnPlayerPermission;
 			GeneralHooks.ReloadEvent += OnReload;
 		}
@@ -43,7 +43,7 @@ namespace UserSpecificFunctions
 			{
 				ServerApi.Hooks.GameInitialize.Deregister(this, OnInitialize);
 
-				DiscordBridge.DiscordBridge.Instance.ChatHandler.PlayerChatting -= OnChat;
+				ChatHandler.PlayerChatting -= OnChat;
 				PlayerHooks.PlayerPermission -= OnPlayerPermission;
 				GeneralHooks.ReloadEvent -= OnReload;
 			}
@@ -80,6 +80,10 @@ namespace UserSpecificFunctions
 			{
 				return;
 			}
+
+			// Remove group prefix/suffix
+			args.Message.Prefixes.RemoveAll(s => s.Text == args.Player.Group.Prefix);
+			args.Message.Suffixes.RemoveAll(s => s.Text == args.Player.Group.Suffix);
 
 			args.Message.Prefix(args.Player.GetPlayerInfo().Prefix)
 						.Suffix(args.Player.GetPlayerInfo().Suffix)
