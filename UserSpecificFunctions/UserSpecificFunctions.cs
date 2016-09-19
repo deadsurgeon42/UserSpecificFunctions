@@ -81,13 +81,23 @@ namespace UserSpecificFunctions
 				return;
 			}
 
-			// Remove group prefix/suffix
-			args.Message.Prefixes.RemoveAll(s => s.Text == args.Player.Group.Prefix);
-			args.Message.Suffixes.RemoveAll(s => s.Text == args.Player.Group.Suffix);
+			// Change prefix if the player has a custom prefix
+			if (!String.IsNullOrWhiteSpace(args.Player.GetPlayerInfo().Prefix))
+			{
+				args.Message.Prefixes.RemoveAll(s => s.Text == args.Player.Group.Prefix);
+				args.Message.Prefix(args.Player.GetPlayerInfo().Prefix);
+			}
 
-			args.Message.Prefix(args.Player.GetPlayerInfo().Prefix)
-						.Suffix(args.Player.GetPlayerInfo().Suffix)
-						.Colorize(args.Player.GetPlayerInfo().ChatColor?.ToColor());
+			// Change suffix if the player has a custom suffix
+			if (!String.IsNullOrWhiteSpace(args.Player.GetPlayerInfo().Suffix))
+			{
+				args.Message.Suffixes.RemoveAll(s => s.Text == args.Player.Group.Suffix);
+				args.Message.Suffix(args.Player.GetPlayerInfo().Suffix);
+			}
+
+			// Colorize the message if the player has a custom color
+			if (!String.IsNullOrWhiteSpace(args.Player.GetPlayerInfo().ChatColor))
+				args.Message.Colorize(args.Player.GetPlayerInfo().ChatColor?.ToColor());
 		}
 
 		/// <summary>
