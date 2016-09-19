@@ -95,9 +95,12 @@ namespace UserSpecificFunctions
 				args.Message.Suffix(args.Player.GetPlayerInfo().Suffix);
 			}
 
+			args.ColorFormatters.Add("USF",String.IsNullOrWhiteSpace(args.Player.GetPlayerInfo().ChatColor)
+				? null : args.Player.GetPlayerInfo().ChatColor?.ToColor());
+
 			// Colorize the message if the player has a custom color
-			if (!String.IsNullOrWhiteSpace(args.Player.GetPlayerInfo().ChatColor))
-				args.Message.Colorize(args.Player.GetPlayerInfo().ChatColor?.ToColor());
+			if (args.ColorFormatters["USF"].HasValue)
+				args.Message.Colorize(args.ColorFormatters["USF"]);
 		}
 
 		/// <summary>
