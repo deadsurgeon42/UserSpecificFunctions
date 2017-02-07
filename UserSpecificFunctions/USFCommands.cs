@@ -4,6 +4,7 @@ using TShockAPI;
 using TShockAPI.DB;
 using UserSpecificFunctions.Extensions;
 using static UserSpecificFunctions.UserSpecificFunctions;
+using Microsoft.Xna.Framework;
 
 namespace UserSpecificFunctions
 {

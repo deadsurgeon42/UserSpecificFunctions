@@ -10,7 +10,7 @@ using DiscordBridge.Chat;
 
 namespace UserSpecificFunctions
 {
-	[ApiVersion(1, 23)]
+	[ApiVersion(2, 0)]
 	public class UserSpecificFunctions : TerrariaPlugin
 	{
 		public override string Name { get { return "User Specific Functions"; } }

@@ -1,8 +1,8 @@
 .vs/
-*.dll
 *.xml
 *.pdb
 *.exe
+*.userprefs
 \bin
 \obj
 \obj\Debug
